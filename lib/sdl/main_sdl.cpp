@@ -77,6 +77,8 @@ const char *BACKEND = "SDL";
 std::map<KEY_CODE, SDL_Keycode> KEY_CODE_to_SDLKey;
 std::map<SDL_Keycode, KEY_CODE > SDLKey_to_KEY_CODE;
 
+static SDL_GameController *gamepad;
+
 int realmain(int argc, char *argv[]);
 
 // the main stub which calls realmain() aka, WZ's main startup routines
@@ -735,6 +737,24 @@ void inputInitialise(void)
 	dragY = mouseYPos = screenHeight / 2;
 	dragKey = MOUSE_LMB;
 
+	// Gamepad init 
+	debug(LOG_MAIN, "Init Gamepad - Gamepads count: %i", SDL_NumJoysticks());
+
+	SDL_Init(SDL_INIT_GAMECONTROLLER);
+
+	for (unsigned int i = 0; i < SDL_NumJoysticks(); ++i) {
+		if (SDL_IsGameController(i)) {
+			char *mapping;
+			debug(LOG_MAIN, "Index \'%i\' is a compatible controller, named \'%s\'", i, SDL_GameControllerNameForIndex(i));
+			gamepad = SDL_GameControllerOpen(i);
+			mapping = SDL_GameControllerMapping(gamepad);
+			debug(LOG_MAIN, "Controller %i is mapped as \"%s\".", i, mapping);
+			SDL_free(mapping);
+			break;
+		} else {
+			debug(LOG_MAIN, "Index \'%i\' is not a compatible controller.", i);
+		}
+	}
 }
 
 /* Clear the input buffer */
@@ -2088,6 +2108,25 @@ static void handleActiveEvent(SDL_Event *event)
 			break;
 		}
 	}
+}
+
+bool gamepadButtonPressed(GAMEPAD_BUTTON btn) {
+	if (gamepad == NULL || btn < 0 || ((int)btn) > ((int)SDL_CONTROLLER_BUTTON_MAX)) return false;
+	return SDL_GameControllerGetButton(gamepad, (SDL_GameControllerButton) btn) == SDL_PRESSED;
+}
+
+float gamepadAxisValue(GAMEPAD_AXIS axis) {
+	if (gamepad == NULL || axis < 0 || ((int)axis) > ((int)SDL_CONTROLLER_AXIS_MAX)) return 0;
+
+	const int deadzone = 32767 / 100;
+	const int rawvalue = SDL_GameControllerGetAxis(gamepad, (SDL_GameControllerAxis)(axis));
+	int value = 0;
+
+	if (abs(rawvalue) > deadzone) {
+		value = rawvalue;
+	}
+
+	return (float) value / 32767;
 }
 
 // Actual mainloop
