@@ -21,6 +21,7 @@
 
 #include "lib/framework/frameresource.h"
 #include "lib/framework/file.h"
+#include "3rdparty/xbr/xbr.h"
 
 #include "bitimage.h"
 #include "tex.h"
@@ -158,6 +159,8 @@ inline void ImageMerge::arrange()
 	}
 }
 
+const std::string upscaleImageFilenameSuffixSegment = "scale=2x";
+
 IMAGEFILE *iV_LoadImageFile(const char *fileName)
 {
 	// Find the directory of images.
@@ -206,26 +209,85 @@ IMAGEFILE *iV_LoadImageFile(const char *fileName)
 			free(pFileData);
 			return nullptr;
 		}
-		imageFile->imageNames[numImages].first = tmpName;
+		
+		std::string spriteName = tmpName;
+		std::string parameters = "";
+
+		int qmIndex = spriteName.find_first_of('?');
+		if(qmIndex > -1)
+		{
+			parameters = spriteName.substr(qmIndex + 1);
+			spriteName = spriteName.substr(0, qmIndex);
+		}
+
+		imageFile->imageNames[numImages].first = spriteName;
 		imageFile->imageNames[numImages].second = numImages;
-		std::string spriteName = imageDir + tmpName;
+
+		std::string spriteSrc = imageDir + spriteName;
 
 		ImageMergeRectangle *imageRect = &pageLayout.images[numImages];
 		imageRect->index = numImages;
 		imageRect->data = new iV_Image;
-		if (!iV_loadImage_PNG(spriteName.c_str(), imageRect->data))
+		if (!iV_loadImage_PNG(spriteSrc.c_str(), imageRect->data))
 		{
-			debug(LOG_ERROR, "Failed to find image \"%s\" listed in \"%s\".", spriteName.c_str(), fileName);
+			debug(LOG_ERROR, "Failed to find image \"%s\" listed in \"%s\".", spriteSrc.c_str(), fileName);
 			delete imageFile;
 			free(pFileData);
 			return nullptr;
 		}
+
+		bool upscale = upscaleImageFilenameSuffixSegment == parameters;
+
+		if(upscale && imageRect->data->depth == 4){
+			uint32_t* src = new uint32_t[imageRect->data->height * imageRect->data->width];
+			uint32_t* trg = new uint32_t[imageRect->data->height * 2 * imageRect->data->width * 2];
+
+			for(int y = 0; y < imageRect->data->height; y++)
+			{
+				for(int x = 0; x < imageRect->data->width; x++)
+				{
+					uint32_t pixel = 
+						imageRect->data->bmp[y * imageRect->data->width * 4 + x * 4 + 0] |
+						imageRect->data->bmp[y * imageRect->data->width * 4 + x * 4 + 1] << 8 |
+						imageRect->data->bmp[y * imageRect->data->width * 4 + x * 4 + 2] << 16 |
+						imageRect->data->bmp[y * imageRect->data->width * 4 + x * 4 + 3] << 24;
+
+					src[y * imageRect->data->width + x] = pixel;
+				}
+			}
+
+			scaleSuperXBR(2, src, trg, imageRect->data->width, imageRect->data->height);
+
+			unsigned char* newData = (unsigned char *)malloc(imageRect->data->height * 2 * imageRect->data->width * 2 * 4);
+
+			for(int y = 0; y < imageRect->data->height * 2; y++)
+			{
+				for(int x = 0; x < imageRect->data->width * 2; x++)
+				{
+					uint32_t pixel = trg[y * imageRect->data->width * 2 + x];
+
+					newData[y * imageRect->data->width * 2 * 4 + x * 4 + 0] = (pixel) & 0xFF;
+					newData[y * imageRect->data->width * 2 * 4 + x * 4 + 1] = (pixel >> 8) & 0xFF;
+					newData[y * imageRect->data->width * 2 * 4 + x * 4 + 2] = (pixel >> 16) & 0xFF;
+					newData[y * imageRect->data->width * 2 * 4 + x * 4 + 3] = (pixel >> 24) & 0xFF;
+				}
+			}
+
+			free(imageRect->data->bmp);
+			imageRect->data->bmp = newData;
+			imageRect->data->width *= 2;
+			imageRect->data->height *= 2;
+
+			delete[] src;
+			delete[] trg;
+		}
+
 		imageRect->siz = Vector2i(imageRect->data->width, imageRect->data->height);
 		numImages++;
 		ptr += temp;
 		while (ptr < pFileData + pFileSize && *ptr++ != '\n') {} // skip rest of line
 
-		images.insert(std::make_pair(WzString::fromUtf8(tmpName), ImageDef));
+		images.insert(std::make_pair(WzString::fromUtf8(spriteName), ImageDef));
 	}
 	free(pFileData);
 

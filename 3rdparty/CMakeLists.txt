@@ -27,3 +27,18 @@ set(SHA2_SOURCES
 add_library(sha2 STATIC ${SHA2_HEADERS} ${SHA2_SOURCES})
 set_property(TARGET sha2 PROPERTY FOLDER "3rdparty")
 target_include_directories(sha2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+
+
+# xBR-library
+
+set(XBR_HEADERS
+	xbr/xbr.h
+)
+
+set(XBR_SOURCES
+	xbr/xbr.cpp
+)
+
+add_library(xbr STATIC ${XBR_HEADERS} ${XBR_SOURCES})
+set_property(TARGET xbr PROPERTY FOLDER "3rdparty")
+target_include_directories(xbr PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
