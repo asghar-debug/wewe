@@ -23,6 +23,7 @@
 
 #include "lib/framework/frame.h"
 #include "lib/framework/opengl.h"
+#include "lib/framework/math_ext.h"
 
 #include "lib/gamelib/gtime.h"
 #include "lib/ivis_opengl/piedef.h"
@@ -122,6 +123,179 @@ void pie_TransColouredTriangle(const std::array<Vector3f, 3> &vrt, PIELIGHT c, c
 	glEnableVertexAttribArray(program.locVertex);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glDisableVertexAttribArray(program.locVertex);
+}
+
+GLuint depthTexture;
+
+void saveDepthBuffer(unsigned int screenWidth, unsigned int screenHeight){
+	if(depthTexture == 0)
+	{
+		glGenTextures(1, &depthTexture);
+		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, screenWidth,screenHeight);
+}
+
+void drawRange(Vector3i p1, int radius, Vector3i position, Vector3i rotation, float distance, int screenWidth, int screenHeight, Vector3f color)
+{
+	const glm::mat4 &viewMatrix =
+		glm::translate(glm::vec3(0.f, 0.f, distance)) *
+		glm::scale(glm::vec3(pie_GetResScalingFactor() / 100.f)) *
+		glm::rotate(rotation.z * (360.f / 65536.0f) * (3.141592f / 180.0f), glm::vec3(0.f, 0.f, 1.f)) *
+		glm::rotate(rotation.x * (360.f / 65536.0f) * (3.141592f / 180.0f), glm::vec3(1.f, 0.f, 0.f)) *
+		glm::rotate(rotation.y * (360.f / 65536.0f) * (3.141592f / 180.0f), glm::vec3(0.f, 1.f, 0.f)) *
+		glm::translate(glm::vec3(-position.x, -position.y, position.z)) *
+		glm::translate(glm::vec3(p1.x, 0, -p1.y)) *
+		glm::scale(glm::vec3(radius));
+		
+	static GLuint shaderProgram = 0;
+
+	if(shaderProgram == 0)
+	{
+		shaderProgram = glCreateProgram();
+		glBindAttribLocation(shaderProgram, 0, "vertex");
+
+		GLint status;
+		GLint infologLen = 0;
+		GLint charsWritten = 0;
+		GLchar *infoLog = nullptr;
+
+		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		const char* vertexShaderSource[1] = {
+			"attribute vec4 c;uniform mat4 ModelViewProjectionMatrix;void main(void) {gl_Position = ModelViewProjectionMatrix * c;}"
+		};
+		glShaderSource(vertexShader, 1, vertexShaderSource, nullptr);
+		glCompileShader(vertexShader);
+
+		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
+
+		if (!status)
+		{
+			printf("Error compiling vertex shader\n");
+			glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infologLen);
+			infoLog = (GLchar *)malloc(infologLen);
+			glGetShaderInfoLog(vertexShader, infologLen, &charsWritten, infoLog);
+			printf("%s\n", infoLog);
+			free(infoLog);
+			exit(1);
+		}
+
+		glAttachShader(shaderProgram, vertexShader);
+
+		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		const char* fragmentShaderSource[1] = {
+			"uniform ivec2 screen;uniform sampler2D tex;uniform vec3 color;void main(void) {vec4 t = texture(tex, vec2(gl_FragCoord.x / screen.x, gl_FragCoord.y / screen.y));float z = abs(gl_FragCoord.z - t.z) * 1000;float distance = clamp(z, 0, 1);float opacity = 1 - clamp(z / 4, 0, 1);gl_FragColor=vec4(distance > 0.5 ? color : mix(vec3(1), color, distance / 0.5), opacity);}"
+		};
+		glShaderSource(fragmentShader, 1, fragmentShaderSource, nullptr);
+		glCompileShader(fragmentShader);
+
+		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
+
+		if (!status)
+		{
+			printf("Error compiling fragment shader\n");
+			glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infologLen);
+			infoLog = (GLchar *)malloc(infologLen);
+			glGetShaderInfoLog(fragmentShader, infologLen, &charsWritten, infoLog);
+			printf("%s\n", infoLog);
+			free(infoLog);
+			exit(1);
+		}
+
+		glAttachShader(shaderProgram, fragmentShader);
+
+		glLinkProgram(shaderProgram);
+
+		// Check for linkage errors
+		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
+		if (!status)
+		{
+			printf("Error linking program\n");
+			glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infologLen);
+			infoLog = (GLchar *)malloc(infologLen);
+			glGetProgramInfoLog(shaderProgram, infologLen, &charsWritten, infoLog);
+			printf("%s\n", infoLog);
+			free(infoLog);
+			exit(1);
+		}
+
+	}
+
+	glUseProgram(shaderProgram);
+	pie_SetRendMode(REND_ADDITIVE);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_CULL_FACE);
+
+	// TODO: Interpolate position!
+
+	static std::vector<float> vrt;
+
+	if(vrt.size() == 0)
+	{
+		float v1, v2;
+
+		for(int i = 0; i < 32; i++)
+		{
+			v1 = 2.f * M_PI / 32 * i;
+			v2 = 2.f * M_PI / 32 * (i + 1);
+
+			vrt.push_back(cos(v1));
+			vrt.push_back(1000);
+			vrt.push_back(sin(v1));
+
+			vrt.push_back(cos(v1));
+			vrt.push_back(0);
+			vrt.push_back(sin(v1));
+
+			vrt.push_back(cos(v2));
+			vrt.push_back(0);
+			vrt.push_back(sin(v2));
+
+			vrt.push_back(cos(v1));
+			vrt.push_back(1000);
+			vrt.push_back(sin(v1));
+
+			vrt.push_back(cos(v2));
+			vrt.push_back(0);
+			vrt.push_back(sin(v2));
+
+			vrt.push_back(cos(v2));
+			vrt.push_back(1000);
+			vrt.push_back(sin(v2));
+		}
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glUniform3f(glGetUniformLocation(shaderProgram, "color"), color.x, color.y, color.b);
+	glUniform1i(glGetUniformLocation(shaderProgram, "tex"), 0);
+	glUniform2i(glGetUniformLocation(shaderProgram, "screen"), screenWidth, screenHeight);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ModelViewProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(pie_PerspectiveGet() * viewMatrix));
+
+	static gfx_api::buffer* vrtBuffer = nullptr;
+	if (!vrtBuffer)
+		vrtBuffer = gfx_api::context::get().create_buffer_object(gfx_api::buffer::usage::vertex_buffer, gfx_api::context::buffer_storage_hint::stream_draw);
+	vrtBuffer->upload(vrt.size() * sizeof(float), vrt.data());
+	vrtBuffer->bind();
+	glVertexAttribPointer(glGetAttribLocation(shaderProgram, "c"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(glGetAttribLocation(shaderProgram, "c"));
+
+	glDrawArrays(GL_TRIANGLES, 0, vrt.size() / 3);
+	glDisableVertexAttribArray(glGetAttribLocation(shaderProgram, "c"));
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
+	pie_SetDepthBufferStatus(DEPTH_CMP_LEQ_WRT_ON);
 }
 
 void pie_Skybox_Init()
