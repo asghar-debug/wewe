@@ -35,6 +35,7 @@
 #include "action.h"
 #include "display.h"
 #include "droid.h"
+#include "drive.h"
 #include "fpath.h"
 #include "group.h"
 #include "map.h"
@@ -527,7 +528,7 @@ static void HandleDrag()
 {
 	UDWORD dragX = 0, dragY = 0;
 
-	if (mouseDrag(MOUSE_LMB, &dragX, &dragY) && !mouseOverRadar && !mouseDown(MOUSE_RMB))
+	if (mouseDrag(MOUSE_LMB, &dragX, &dragY) && !isDriving() && !mouseOverRadar && !mouseDown(MOUSE_RMB))
 	{
 		dragBox3D.x1 = dragX;
 		dragBox3D.x2 = mouseX();
@@ -565,6 +566,14 @@ void processMouseClickInput()
 	bool OverRadar = OverRadarAndNotDragging();
 
 	ignoreOrder = CheckFinishedFindPosition();
+
+	if(isDriving()){
+		if(mouseReleased(MOUSE_LMB)){
+			driveModeClick();
+		}
+		processDrivingCursor();
+		return;
+	}
 
 	CheckStartWallDrag();
 
@@ -617,7 +626,7 @@ void processMouseClickInput()
 		{
 			dealWithRMB();
 		}
-		// Why?
+		// if clicked RMB (and not rotating), stop droid tracking
 		if (getWarCamStatus())
 		{
 			camToggleStatus();
@@ -953,7 +962,7 @@ static void handleCameraScrolling()
 	float scaled_max_scroll_speed = scroll_zoom_factor * (cameraAccel ? war_GetCameraSpeed() : war_GetCameraSpeed() / 2);
 	float scaled_accel = scaled_max_scroll_speed / 2;
 
-	if (InGameOpUp || bDisplayMultiJoiningStatus || isInGamePopupUp)		// cant scroll when menu up. or when over radar
+	if (isDriving() || InGameOpUp || bDisplayMultiJoiningStatus || isInGamePopupUp)		// cant scroll when driving, menu up, or when over radar
 	{
 		return;
 	}
@@ -1092,10 +1101,11 @@ bool CheckScrollLimits()
 	return ret;
 }
 
-/* Do the 3D display */
-void displayWorld()
-{
-	Vector3i pos;
+void processCameraRotation(){
+	if (isDriving())
+	{
+		return;
+	}
 
 	if (panActive)
 	{
@@ -1140,14 +1150,23 @@ void displayWorld()
 
 	if (!mouseDown(MOUSE_ROTATE) && rotActive)
 	{
+		Vector3i pos;
+
 		rotActive = false;
 		ignoreRMBC = true;
 		pos.x = player.r.x;
 		pos.y = player.r.y;
 		pos.z = player.r.z;
+		// inform war cam of new camera orientation.
 		camInformOfRotation(&pos);
 		bRadarDragging = false;
 	}
+}
+
+/* Do the 3D display */
+void displayWorld()
+{
+	processCameraRotation();
 
 	draw3DScene();
 
@@ -1878,7 +1897,7 @@ void	dealWithLMB()
 	{
 		return;
 	}
-
+	
 	/* What have we clicked on? */
 	psClickedOn = mouseTarget();
 	if (psClickedOn)
