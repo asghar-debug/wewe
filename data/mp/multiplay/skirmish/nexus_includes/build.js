@@ -58,10 +58,10 @@ function structuresBuiltInRange(structInfo, x, y, playerType, range, visible)
 		visible = true;
 	}
 
-	var infoStore = [];
-	var objects = enumRange(x, y, range, playerType, visible);
-	var isString = (typeof(structInfo) === "string");
-	var isNum = (typeof(structInfo) === "number");
+	const infoStore = [];
+	const objects = enumRange(x, y, range, playerType, visible);
+	const isString = typeof(structInfo) === "string";
+	const isNum = typeof(structInfo) === "number";
 
 	if (!isNum && !isString)
 	{
@@ -69,10 +69,10 @@ function structuresBuiltInRange(structInfo, x, y, playerType, range, visible)
 		return [];
 	}
 
-	for (var i = 0, len = objects.length; i < len; ++i)
+	for (let i = 0, len = objects.length; i < len; ++i)
 	{
-		var obj = objects[i];
-		var tmp = {type: obj.type, player: obj.player, id: obj.id};
+		const obj = objects[i];
+		const tmp = {type: obj.type, player: obj.player, id: obj.id};
 
 		if (obj.type !== STRUCTURE)
 		{
@@ -115,7 +115,7 @@ function conCanHelp(droidID, x, y, help)
 		help = true;
 	}
 
-	var droid = getObject(DROID, me, droidID);
+	const droid = getObject(DROID, me, droidID);
 
 	if (droid === null)
 	{
@@ -164,15 +164,15 @@ function grabTrucksAndBuild(stat, location, tileRange, maxBlockingTiles, group)
 		group = groups.baseBuilders;
 	}
 
-	var loc2;
-	var closestDroid;
-	var closestDistance = Infinity;
-	var numHelpDroids = 0;
-	var droids = enumGroup(group);
+	let loc2;
+	let closestDroid;
+	let closestDistance = Infinity;
+	let numHelpDroids = 0;
+	const droids = enumGroup(group);
 
-	for (var i = 0, l = droids.length; i < l; ++i)
+	for (let i = 0, l = droids.length; i < l; ++i)
 	{
-		var droid = droids[i];
+		const droid = droids[i];
 
 		if (conCanHelp(droid.id, droid.x, droid.y, true))
 		{
@@ -202,7 +202,7 @@ function grabTrucksAndBuild(stat, location, tileRange, maxBlockingTiles, group)
 
 			if (loc2 && numWeapObjectsInRange(loc2.x, loc2.y, ENEMIES, 7, false).safe)
 			{
-				var currDist = distBetweenTwoPoints(loc2.x, loc2.y, droid.x, droid.y);
+				const currDist = distBetweenTwoPoints(loc2.x, loc2.y, droid.x, droid.y);
 
 				if (currDist < tileRange)
 				{
@@ -230,9 +230,9 @@ function grabTrucksAndBuild(stat, location, tileRange, maxBlockingTiles, group)
 
 function buildDerrick()
 {
-	var numBusy = 0;
-	var droids = enumGroup(groups.oilBuilders);
-	var drLen = droids.length;
+	let numBusy = 0;
+	const droids = enumGroup(groups.oilBuilders);
+	const drLen = droids.length;
 	droids.forEach(function(d) {
 		if (!conCanHelp(d.id, d.x, d.y, false))
 		{
@@ -246,13 +246,13 @@ function buildDerrick()
 		return;
 	}
 
-	var oils = enumFeature(-1, FEATURE_STATS.oils).sort(sortByDistToBase);
+	const oils = enumFeature(-1, FEATURE_STATS.oils).sort(sortByDistToBase);
 
-	for (var i = 0, oilLen = oils.length; i < oilLen; ++i)
+	for (let i = 0, oilLen = oils.length; i < oilLen; ++i)
 	{
-		var targetOil;
-		var bestDroid;
-		var bestDist = Infinity;
+		let targetOil;
+		let bestDroid;
+		let bestDist = Infinity;
 
 		//And don't waste time if all trucks became busy.
 		if (numBusy == drLen)
@@ -260,16 +260,16 @@ function buildDerrick()
 			break;
 		}
 
-		for (var j = 0; j < drLen; ++j)
+		for (let j = 0; j < drLen; ++j)
 		{
-			var oil = oils[i];
-			var droid = droids[j];
+			const oil = oils[i];
+			const droid = droids[j];
 
 			if (!droid.busy &&
 				conCanHelp(droid.id, oil.x, oil.y, false) &&
 				!threatInRange(oil.x, oil.y, ENEMIES, OIL_THREAT_RADIUS, false))
 			{
-				var dist = distBetweenTwoPoints(droid.x, droid.y, oil.x, oil.y);
+				const dist = distBetweenTwoPoints(droid.x, droid.y, oil.x, oil.y);
 
 				if (dist < bestDist)
 				{
@@ -311,7 +311,7 @@ function getBestRandomDefense(array, range)
 		range = 3; //Eh
 	}
 
-	var len = array.length;
+	const len = array.length;
 
 	if (range >= len)
 	{
@@ -319,9 +319,9 @@ function getBestRandomDefense(array, range)
 		range = (len - 1);
 	}
 
-	var count = len - 1;
-	var count2 = 0;
-	var defenses = [];
+	let count = len - 1;
+	let count2 = 0;
+	const defenses = [];
 
 	while ((count2 < range) && (count >= 0))
 	{
@@ -381,11 +381,11 @@ function findUndefendedObjectLoc(whatToScan, defenses, objectLimit, tower)
 
 	const SCAN_RADIUS = 6;
 	const MAX_BUILDERS = 2;
-	var objectsToCheck = enumStruct(me, whatToScan);
+	const objectsToCheck = enumStruct(me, whatToScan);
 
-	for (var i = 0, len = objectsToCheck.length; i < len; ++i)
+	for (let i = 0, len = objectsToCheck.length; i < len; ++i)
 	{
-		var obj = objectsToCheck[i];
+		const obj = objectsToCheck[i];
 
 		if (threatInRange(obj.x, obj.y, ENEMIES, 3, false) ||
 			!safeDest(me, obj.x, obj.y) ||
@@ -410,9 +410,9 @@ function findUndefendedObjectLoc(whatToScan, defenses, objectLimit, tower)
 
 function derrickDefense()
 {
-	var best = bestStructureIn(STANDARD_INCENDIARIES);
-	var success = false;
-	var loc = findUndefendedObjectLoc(BASE_STRUCTURES.sensors, STANDARD_INCENDIARIES, 3, false);
+	const best = bestStructureIn(STANDARD_INCENDIARIES);
+	let success = false;
+	const loc = findUndefendedObjectLoc(BASE_STRUCTURES.sensors, STANDARD_INCENDIARIES, 3, false);
 
 	if (defined(loc) && defined(best) && grabTrucksAndBuild(best, loc, 6, 4, groups.oilBuilders))
 	{
@@ -424,9 +424,9 @@ function derrickDefense()
 
 function sensorBuild()
 {
-	var best = bestStructureIn(BASE_STRUCTURES.sensors);
-	var success = false;
-	var loc = findUndefendedObjectLoc(BASE_STRUCTURES.derricks, BASE_STRUCTURES.sensors, Infinity, true);
+	const best = bestStructureIn(BASE_STRUCTURES.sensors);
+	let success = false;
+	const loc = findUndefendedObjectLoc(BASE_STRUCTURES.derricks, BASE_STRUCTURES.sensors, Infinity, true);
 
 	if (defined(loc) && defined(best) && grabTrucksAndBuild(best, loc, 6, 4, groups.oilBuilders))
 	{
@@ -444,16 +444,16 @@ function buildPowerGenerators()
 		return false;
 	}
 
-	var unusedDerricks = (countStruct(BASE_STRUCTURES.derricks) - countStruct(BASE_STRUCTURES.gens) * 4);
+	const unusedDerricks = countStruct(BASE_STRUCTURES.derricks) - countStruct(BASE_STRUCTURES.gens) * 4;
 
 	return ((!countStruct(BASE_STRUCTURES.gens) || (unusedDerricks > 0)) && grabTrucksAndBuild(BASE_STRUCTURES.gens, BASE, 12, 0));
 }
 
 function buildMinimumBase()
 {
-	for (var i = 0, len = STANDARD_BUILD_FUNDAMENTALS.length; i < len; ++i)
+	for (let i = 0, len = STANDARD_BUILD_FUNDAMENTALS.length; i < len; ++i)
 	{
-		var s = STANDARD_BUILD_FUNDAMENTALS[i];
+		const s = STANDARD_BUILD_FUNDAMENTALS[i];
 
 		if (countStruct(s) < 1 && grabTrucksAndBuild(s, BASE, 12, 0))
 		{
@@ -520,17 +520,17 @@ function buildBase()
 // Structures that a personality can build before the default build order.
 function personalityBuildOrder()
 {
-	var success = false;
+	let success = false;
 
-	for (var i = 0, len = nexusBranch[branch].buildOrder.length; i < len; ++i)
+	for (let i = 0, len = nexusBranch[branch].buildOrder.length; i < len; ++i)
 	{
 		if (success)
 		{
 			break;
 		}
 
-		var obj = nexusBranch[branch].buildOrder[i];
-		var count;
+		const obj = nexusBranch[branch].buildOrder[i];
+		let count;
 
 		switch (obj.stat)
 		{
@@ -578,7 +578,7 @@ function personalityBuildOrder()
 function buildMaxsBasedOnDerricks()
 {
 	const DERRICK_COUNT = countStruct(BASE_STRUCTURES.derricks, me);
-	var amount;
+	let amount;
 
 	if (DERRICK_COUNT <= 8)
 	{
@@ -602,8 +602,8 @@ function buildMaxsBasedOnDerricks()
 
 function buildMaximums()
 {
-	var amount = buildMaxsBasedOnDerricks();
-	var currStructCount = countStruct(BASE_STRUCTURES.labs);
+	const amount = buildMaxsBasedOnDerricks();
+	let currStructCount = countStruct(BASE_STRUCTURES.labs);
 
 	if (currStructCount < getStructureLimit(BASE_STRUCTURES.labs, me) && currStructCount < amount && grabTrucksAndBuild(BASE_STRUCTURES.labs, BASE, 25, 0))
 	{
@@ -645,7 +645,7 @@ function buildExpand()
 		return false; // do not expand base with low power
 	}
 
-	var count = countStruct(BASE_STRUCTURES.vtolPads);
+	const count = countStruct(BASE_STRUCTURES.vtolPads);
 
 	if (count < getStructureLimit(BASE_STRUCTURES.vtolPads, me) &&
 		Math.floor((count * 4) / 3) <= numVtolUnits &&
@@ -685,27 +685,23 @@ function buildModules()
 		return false;
 	}
 
-	var struct = null;
-	var moduleObject = {}; //a copy of nexusBranch[branch].moduleOrder[x]
-	var success = false;
-	var i = 0;
-	var j = 0;
-	var len = 0;
-	var len2 = 0;
+	let struct = null;
+	let moduleObject = {}; //a copy of nexusBranch[branch].moduleOrder[x]
+	let success = false;
 
-	for (i = 0, len = nexusBranch[branch].moduleOrder.length; i < len; ++i)
+	for (let i = 0, len = nexusBranch[branch].moduleOrder.length; i < len; ++i)
 	{
-		var modObj = nexusBranch[branch].moduleOrder[i];
-		var structList = enumStruct(me, modObj.structure);
+		const modObj = nexusBranch[branch].moduleOrder[i];
+		const structList = enumStruct(me, modObj.structure);
 
 		if (!isStructureAvailable(modObj.mod))
 		{
 			continue;
 		}
 
-		for (j = 0, len2 = structList.length; j < len2; ++j)
+		for (let j = 0, len2 = structList.length; j < len2; ++j)
 		{
-			var s = structList[j];
+			const s = structList[j];
 
 			if (s.status === BUILT && s.modules < modObj.amount)
 			{
@@ -731,11 +727,11 @@ function buildModules()
 		return false; //Everything not a power module costs power
 	}
 
-	var builders = enumGroup(groups.baseBuilders);
+	const builders = enumGroup(groups.baseBuilders);
 
-	for (i = 0, len = builders.length; i < len; ++i)
+	for (let i = 0, len = builders.length; i < len; ++i)
 	{
-		var dr = builders[i];
+		const dr = builders[i];
 
 		if (conCanHelp(dr.id, struct.x, struct.y, true) &&
 			numBuildSameBuilding(struct.x, struct.y) < moduleObject.maxBuilders &&
@@ -754,11 +750,11 @@ function numBuildSameBuilding(x, y)
 {
 	return false;
 	/*
-	var numSameBuilding = 0;
-	var trucks = enumGroup(groups.baseBuilders);
-	for (var i = 0, len = trucks.length; i < len; ++i)
+	let numSameBuilding = 0;
+	const trucks = enumGroup(groups.baseBuilders);
+	for (let i = 0, len = trucks.length; i < len; ++i)
 	{
-		var dr = trucks[i];
+		const dr = trucks[i];
 		if (distBetweenTwoPoints(x, y, dr.x, dr.y) <= 1 && conCanHelp(dr.id, x, y, false))
 		{
 			++numSameBuilding;
@@ -771,17 +767,17 @@ function numBuildSameBuilding(x, y)
 function finishStructs()
 {
 	const MAX_REBUILD_DIST = 30; //was 20
-	var success = false;
-	var trucks = enumGroup(groups.baseBuilders);
-	var structures = enumStruct(me);
+	let success = false;
+	const trucks = enumGroup(groups.baseBuilders);
+	const structures = enumStruct(me);
 
-	for (var i = 0, len = trucks.length; i < len; ++i)
+	for (let i = 0, len = trucks.length; i < len; ++i)
 	{
-		var dr = trucks[i];
+		const dr = trucks[i];
 
-		for (var j = 0, len2 = structures.length; j < len2; ++j)
+		for (let j = 0, len2 = structures.length; j < len2; ++j)
 		{
-			var st = structures[j];
+			const st = structures[j];
 
 			if (st.status === BUILT || st.stattype === DEFENSE || st.stattype === WALL)
 			{
@@ -804,11 +800,11 @@ function finishStructs()
 //Scan around the oil builders
 function protectCloseDerrick()
 {
-	var trucks = enumGroup(groups.oilBuilders);
+	const trucks = enumGroup(groups.oilBuilders);
 
-	for (var i = 0, len = trucks.length; i < len; ++i)
+	for (let i = 0, len = trucks.length; i < len; ++i)
 	{
-		var droid = trucks[i];
+		const droid = trucks[i];
 
 		if (droid.order === DORDER_RTR || droid.order === DORDER_BUILD || droid.order === DORDER_LINEBUILD)
 		{
@@ -824,8 +820,8 @@ function protectCloseDerrick()
 					continue;
 				}
 				// Ok, at enemy derrick, and nobody has hurt us yet. Start being nasty.
-				var loc;
-				var choice = getBestRandomDefense(STANDARD_BASIC_DEFENSES, 5);
+				let loc;
+				const choice = getBestRandomDefense(STANDARD_BASIC_DEFENSES, 5);
 
 				if (defined(choice))
 				{
@@ -877,9 +873,9 @@ function bestStructureIn(array)
 		return undefined;
 	}
 
-	for (var i = array.length - 1; i >= 0; --i)
+	for (let i = array.length - 1; i >= 0; --i)
 	{
-		var structure = array[i];
+		const structure = array[i];
 
 		if (isStructureAvailable(structure))
 		{
@@ -900,7 +896,7 @@ function findSafeGateTile(gate)
 		x2: Math.ceil((gate.x1 + gate.x2) / 2),
 		y2: Math.ceil((gate.y1 + gate.y2) / 2),
 	};
-	var verticalCheck = false;
+	let verticalCheck = false;
 
 	if (gate.x1 === gate.x2)
 	{
@@ -923,10 +919,10 @@ function findSafeGateTile(gate)
 		return undefined; //weird gate.
 	}
 
-	for (var j = (verticalCheck ? gate.y1 : gate.x1); j <= (verticalCheck ? gate.y2 : gate.x2); ++j)
+	for (let j = (verticalCheck ? gate.y1 : gate.x1); j <= (verticalCheck ? gate.y2 : gate.x2); ++j)
 	{
-		var xg = (verticalCheck ? gate.x1 : j);
-		var yg = (verticalCheck ? j : gate.y1);
+		const xg = verticalCheck ? gate.x1 : j;
+		const yg = verticalCheck ? j : gate.y1;
 
 		//Skip out of bounds tiles
 		if (coordinatesOutOfBounds(xg, yg))
@@ -934,7 +930,7 @@ function findSafeGateTile(gate)
 			continue;
 		}
 
-		var tileType = terrainType(xg, yg);
+		const tileType = terrainType(xg, yg);
 
 		if (tileType === TER_WATER || tileType === TER_CLIFFFACE)
 		{
@@ -943,8 +939,8 @@ function findSafeGateTile(gate)
 
 		if (getObject(xg, yg) === null)
 		{
-			var dist1 = distBetweenTwoPoints(xg, yg, GATE_MIDDLE.x1, GATE_MIDDLE.y1);
-			var dist2 = distBetweenTwoPoints(xg, yg, GATE_MIDDLE.x2, GATE_MIDDLE.y2);
+			const dist1 = distBetweenTwoPoints(xg, yg, GATE_MIDDLE.x1, GATE_MIDDLE.y1);
+			const dist2 = distBetweenTwoPoints(xg, yg, GATE_MIDDLE.x2, GATE_MIDDLE.y2);
 
 			if (dist1 > 0 && dist2 > 0)
 			{
@@ -957,9 +953,9 @@ function findSafeGateTile(gate)
 
 function buildGates()
 {
-	for (var i = 0, len = MAP_GATES.length; i < len; ++i)
+	for (let i = 0, len = MAP_GATES.length; i < len; ++i)
 	{
-		var gate = MAP_GATES[i];
+		const gate = MAP_GATES[i];
 
 		//If not in base or at risk of being shot at then skip it
 		if (!gateInBase(gate) || !safeDest(me, gate.x1, gate.y1) || !safeDest(me, gate.x2, gate.y2))
@@ -967,15 +963,15 @@ function buildGates()
 			continue;
 		}
 
-		var tile = findSafeGateTile(gate);
+		const tile = findSafeGateTile(gate);
 
 		if (!defined(tile))
 		{
 			continue;
 		}
 
-		var loc = {x: tile.x, y: tile.y, force: true};
-		var defense = getBestRandomDefense(STANDARD_FORTIFY_DEFENSES, 3);
+		const loc = {x: tile.x, y: tile.y, force: true};
+		const defense = getBestRandomDefense(STANDARD_FORTIFY_DEFENSES, 3);
 
 		if (defined(defense) && grabTrucksAndBuild(defense, loc, 40, 4))
 		{
@@ -994,9 +990,9 @@ function rebuildStructures(threatRange)
 		threatRange = 8;
 	}
 
-	for (var i = 0, len = rebuildQueue.length; i < len; ++i)
+	for (let i = 0, len = rebuildQueue.length; i < len; ++i)
 	{
-		var obj = rebuildQueue[i];
+		const obj = rebuildQueue[i];
 
 		if (getObject(obj.x, obj.y) !== null)
 		{
@@ -1007,7 +1003,7 @@ function rebuildStructures(threatRange)
 
 		if (!threatInRange(obj.x, obj.y, ENEMIES, threatRange, false) && safeDest(me, obj.x, obj.y))
 		{
-			var loc = {x: obj.x, y: obj.y, force: true};
+			const loc = {x: obj.x, y: obj.y, force: true};
 
 			if (grabTrucksAndBuild(obj.stat, loc, 50, 4))
 			{
@@ -1023,7 +1019,7 @@ function rebuildStructures(threatRange)
 //xy coordinates. This is stored in the rebuildQueue variable.
 function buildAANearLoc(x, y)
 {
-	var structure = bestStructureIn(STANDARD_ANTI_AIR_DEFENSES);
+	const structure = bestStructureIn(STANDARD_ANTI_AIR_DEFENSES);
 
 	if (!defined(structure))
 	{
@@ -1043,12 +1039,12 @@ function buildAANearLoc(x, y)
 		return;
 	}
 
-	var trucks = enumDroid(me, DROID_CONSTRUCT);
+	const trucks = enumDroid(me, DROID_CONSTRUCT);
 
 	if (trucks.length > 0)
 	{
-		var truck = trucks[0];
-		var loc = pickStructLocation(truck, structure, x, y, 0);
+		const truck = trucks[0];
+		const loc = pickStructLocation(truck, structure, x, y, 0);
 
 		if (loc)
 		{

@@ -14,9 +14,9 @@ function structureTypeValue(what)
 		return 0;
 	}
 
-	for (var i = 0, len = STANDARD_TARGET_WEIGHTS.length; i < len; ++i)
+	for (let i = 0, len = STANDARD_TARGET_WEIGHTS.length; i < len; ++i)
 	{
-		var target = STANDARD_TARGET_WEIGHTS[i];
+		const target = STANDARD_TARGET_WEIGHTS[i];
 
 		if (what.stattype === target.stat)
 		{
@@ -34,9 +34,9 @@ function hasDefinableTarget()
 		return false;
 	}
 
-	var type = targetInfo.what.type;
-	var player = targetInfo.what.player;
-	var id = targetInfo.what.id;
+	const type = targetInfo.what.type;
+	const player = targetInfo.what.player;
+	const id = targetInfo.what.id;
 
 	if (allianceExistsBetween(me, player))
 	{
@@ -72,11 +72,11 @@ function orderGroupLoc(group, x, y, order)
 		order = DORDER_SCOUT;
 	}
 
-	var droids = enumGroup(group);
+	const droids = enumGroup(group);
 
-	for (var i = 0, len = droids.length; i < len; ++i)
+	for (let i = 0, len = droids.length; i < len; ++i)
 	{
-		var droid = droids[i];
+		const droid = droids[i];
 
 		if (droid.order !== DORDER_RTR)
 		{
@@ -87,7 +87,7 @@ function orderGroupLoc(group, x, y, order)
 
 function findMostValuableTarget()
 {
-	var enemy = getCurrentEnemy();
+	const enemy = getCurrentEnemy();
 
 	if (!defined(enemy))
 	{
@@ -95,7 +95,7 @@ function findMostValuableTarget()
 	}
 
 	//Now focuses on what is visible first!
-	var objects = enumArea(0, 0, mapWidth, mapHeight, ENEMIES, true);
+	let objects = enumArea(0, 0, mapWidth, mapHeight, ENEMIES, true);
 
 	if (objects.length === 0)
 	{
@@ -107,19 +107,19 @@ function findMostValuableTarget()
 		}
 	}
 
-	var bestTarget;
-	var bestValue = 0;
+	let bestTarget;
+	let bestValue = 0;
 
-	for (var i = 0, len = objects.length; i < len; ++i)
+	for (let i = 0, len = objects.length; i < len; ++i)
 	{
-		var obj = objects[i];
+		const obj = objects[i];
 
 		if (allianceExistsBetween(me, obj.player))
 		{
 			return 0;
 		}
 
-		var currentValue;
+		let currentValue;
 
 		if (obj.type !== STRUCTURE)
 		{
@@ -148,18 +148,18 @@ function doAllOutAttack()
 	if (hasDefinableTarget() && !helpingAlly())
 	{
 		const MIN_ATTACKERS = 10; //was 40 originally.
-		var droids = enumGroup(groups.attackers);
-		var len = droids.length;
-		var target = getObject(targetInfo.what.type, targetInfo.what.player, targetInfo.what.id);
+		const droids = enumGroup(groups.attackers);
+		const len = droids.length;
+		const target = getObject(targetInfo.what.type, targetInfo.what.player, targetInfo.what.id);
 
 		if (len < MIN_ATTACKERS)
 		{
 			return;
 		}
 
-		for (var i = 0; i < len; ++i)
+		for (let i = 0; i < len; ++i)
 		{
-			var droid = droids[i];
+			const droid = droids[i];
 
 			//eventAttacked can snatch one of these droids and make them focus
 			//on something that attacked them while moving to the target. Allow

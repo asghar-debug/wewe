@@ -5,25 +5,25 @@ receiveAllEvents(true); //Needed to allow enemy research to apply to them
 
 include("script/weather.js");
 
-var mainReticule = false;
+let mainReticule = false;
 const CREATE_LIKE_EVENT = 0;
 const DESTROY_LIKE_EVENT = 1;
 const TRANSFER_LIKE_EVENT = 2;
 
 function reticuleManufactureCheck()
 {
-	var structureComplete = false;
-	var facs = [FACTORY, CYBORG_FACTORY, VTOL_FACTORY,];
+	let structureComplete = false;
+	const facs = [FACTORY, CYBORG_FACTORY, VTOL_FACTORY,];
 
-	for (var i = 0, len = facs.length; i < len; ++i)
+	for (let i = 0, len = facs.length; i < len; ++i)
 	{
-		var facType = facs[i];
-		var offWorldFacs = enumStructOffWorld(selectedPlayer, facType);
-		var onMapFacs = enumStruct(selectedPlayer, facType);
+		const facType = facs[i];
+		const offWorldFacs = enumStructOffWorld(selectedPlayer, facType);
+		const onMapFacs = enumStruct(selectedPlayer, facType);
 
 		if (offWorldFacs !== null)
 		{
-			for (var j = 0, len2 = offWorldFacs.length; j < len2; ++j)
+			for (let j = 0, len2 = offWorldFacs.length; j < len2; ++j)
 			{
 				if (offWorldFacs[j].status === BUILT)
 				{
@@ -34,7 +34,7 @@ function reticuleManufactureCheck()
 		}
 		if (!structureComplete)
 		{
-			for (var j = 0, len2 = onMapFacs.length; j < len2; ++j)
+			for (let j = 0, len2 = onMapFacs.length; j < len2; ++j)
 			{
 				if (onMapFacs[j].status === BUILT)
 				{
@@ -62,18 +62,18 @@ function reticuleManufactureCheck()
 
 function reticuleResearchCheck()
 {
-	var structureComplete = false;
-	var labs = [RESEARCH_LAB,];
+	let structureComplete = false;
+	const labs = [RESEARCH_LAB,];
 
-	for (var i = 0, len = labs.length; i < len; ++i)
+	for (let i = 0, len = labs.length; i < len; ++i)
 	{
-		var resType = labs[i];
-		var offWorldLabs = enumStructOffWorld(selectedPlayer, resType);
-		var onMapLabs = enumStruct(selectedPlayer, resType);
+		const resType = labs[i];
+		const offWorldLabs = enumStructOffWorld(selectedPlayer, resType);
+		const onMapLabs = enumStruct(selectedPlayer, resType);
 
 		if (offWorldLabs !== null)
 		{
-			for (var j = 0, len2 = offWorldLabs.length; j < len2; ++j)
+			for (let j = 0, len2 = offWorldLabs.length; j < len2; ++j)
 			{
 				if (offWorldLabs[j].status === BUILT)
 				{
@@ -84,7 +84,7 @@ function reticuleResearchCheck()
 		}
 		if (!structureComplete)
 		{
-			for (var j = 0, len2 = onMapLabs.length; j < len2; ++j)
+			for (let j = 0, len2 = onMapLabs.length; j < len2; ++j)
 			{
 				if (onMapLabs[j].status === BUILT)
 				{
@@ -124,18 +124,18 @@ function reticuleBuildCheck()
 
 function reticuleDesignCheck()
 {
-	var structureComplete = false;
-	var hqs = [HQ,];
+	let structureComplete = false;
+	const hqs = [HQ,];
 
-	for (var i = 0, len = hqs.length; i < len; ++i)
+	for (let i = 0, len = hqs.length; i < len; ++i)
 	{
-		var hqType = hqs[i];
-		var offWorldHq = enumStructOffWorld(selectedPlayer, hqType);
-		var onMapHq = enumStruct(selectedPlayer, hqType);
+		const hqType = hqs[i];
+		const offWorldHq = enumStructOffWorld(selectedPlayer, hqType);
+		const onMapHq = enumStruct(selectedPlayer, hqType);
 
 		if (offWorldHq !== null)
 		{
-			for (var j = 0, len2 = offWorldHq.length; j < len2; ++j)
+			for (let j = 0, len2 = offWorldHq.length; j < len2; ++j)
 			{
 				if (offWorldHq[j].status === BUILT)
 				{
@@ -146,7 +146,7 @@ function reticuleDesignCheck()
 		}
 		if (!structureComplete)
 		{
-			for (var j = 0, len2 = onMapHq.length; j < len2; ++j)
+			for (let j = 0, len2 = onMapHq.length; j < len2; ++j)
 			{
 				if (onMapHq[j].status === BUILT)
 				{
@@ -199,7 +199,7 @@ function setMainReticule()
 
 function reticuleUpdate(obj, eventType)
 {
-	var update_reticule = false;
+	let update_reticule = false;
 
 	if (eventType === TRANSFER_LIKE_EVENT)
 	{
@@ -287,7 +287,7 @@ function setLimits()
 	setDroidLimit(selectedPlayer, 10, DROID_COMMAND);
 	setDroidLimit(selectedPlayer, 15, DROID_CONSTRUCT);
 
-	for (var i = 0; i < maxPlayers; ++i)
+	for (let i = 0; i < maxPlayers; ++i)
 	{
 		setStructureLimits("A0PowerGenerator", 5, i);
 		setStructureLimits("A0ResourceExtractor", 200, i);
@@ -306,8 +306,8 @@ function setLimits()
 
 function resetPower()
 {
-	var powerLimit = 999999;
-	var powerProductionRate = 100;
+	let powerLimit = 999999;
+	let powerProductionRate = 100;
 
 	// set income modifier/power storage for player 0 (human)
 	if (difficulty === EASY)
@@ -414,15 +414,15 @@ function eventResearched(research, structure, player)
 {
 	//debug("RESEARCH : " + research.fullname + "(" + research.name + ") for " + player);
 	// iterate over all results
-	for (var i = 0; i < research.results.length; i++)
+	for (let i = 0; i < research.results.length; i++)
 	{
-		var v = research.results[i];
+		const v = research.results[i];
 		//debug("    RESULT : class=" + v['class'] + " parameter=" + v['parameter'] + " value=" + v['value'] + " filter=" + v['filterParameter'] + " filterparam=" + v['filterParameter']);
-		for (var cname in Upgrades[player][v['class']]) // iterate over all components of this type
+		for (const cname in Upgrades[player][v['class']]) // iterate over all components of this type
 		{
-			var parameter = v['parameter'];
-			var ctype = v['class'];
-			var filterparam = v['filterParameter'];
+			const parameter = v['parameter'];
+			const ctype = v['class'];
+			const filterparam = v['filterParameter'];
 			if ('filterParameter' in v && Stats[ctype][cname][filterparam] != v['filterValue']) // more specific filter
 			{
 				continue;
@@ -436,7 +436,7 @@ function eventResearched(research, structure, player)
 	}
 }
 
-var lastHitTime = 0;
+let lastHitTime = 0;
 function eventAttacked(victim, attacker)
 {
 	if ((victim.player === selectedPlayer) && gameTime > lastHitTime + 5000)

@@ -25,21 +25,21 @@ function camAbsorbPlayer(who, to)
 		to = NEXUS;
 	}
 
-	var units = enumDroid(who);
+	const units = enumDroid(who);
 
-	for (var i = 0, len = units.length; i < len; i++)
+	for (let i = 0, len = units.length; i < len; i++)
 	{
-		var droid = units[i];
+		const droid = units[i];
 		if (!donateObject(droid, to))
 		{
 			camSafeRemoveObject(droid, false);
 		}
 	}
 
-	var structs = enumStruct(who);
-	for (var i = 0, len = structs.length; i < len; i++)
+	const structs = enumStruct(who);
+	for (let i = 0, len = structs.length; i < len; i++)
 	{
-		var structure = structs[i];
+		const structure = structs[i];
 		if (!donateObject(structure, to))
 		{
 			camSafeRemoveObject(structure, false);
@@ -74,7 +74,7 @@ function camHackIntoPlayer(player, to)
 	const HACK_CHANCE = 25;
 	const TARGET_UNIT_CHANCE = 40;
 	const HACK_DELAY_TIME = camSecondsToMilliseconds(5); //Allows another hack attempt after X seconds.
-	var tmp = [];
+	let tmp = [];
 	if (camRand(100) < TARGET_UNIT_CHANCE)
 	{
 		tmp = enumDroid(player).filter(function(d) {
@@ -105,8 +105,8 @@ function camHackIntoPlayer(player, to)
 	if (__camLastNexusAttack === 0 || (gameTime > (__camLastNexusAttack + HACK_DELAY_TIME)) && (camRand(100) < HACK_CHANCE))
 	{
 		const GIFT_CHANCE = 70; //Else neutralized
-		var obj;
-		var objects;
+		let obj;
+		let objects;
 
 		//Try stealing the HQ first.
 		if (__camLastNexusAttack === 0)
@@ -140,7 +140,7 @@ function camHackIntoPlayer(player, to)
 			//Nexus neutralize sounds.
 			if (obj.player === CAM_HUMAN_PLAYER)
 			{
-				var snd;
+				let snd;
 				if (obj.type === STRUCTURE)
 				{
 					if (obj.stattype === DEFENSE)

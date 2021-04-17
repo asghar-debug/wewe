@@ -16,7 +16,7 @@ function camMarkTiles(label)
 	}
 	else
 	{
-		for (var i = 0, l = label.length; i < l; ++i)
+		for (let i = 0, l = label.length; i < l; ++i)
 		{
 			__camMarkedTiles[label[i]] = true;
 		}
@@ -37,7 +37,7 @@ function camUnmarkTiles(label)
 	}
 	else
 	{
-		for (var i = 0, l = label.length; i < l; ++i)
+		for (let i = 0, l = label.length; i < l; ++i)
 		{
 			delete __camMarkedTiles[label[i]];
 		}
@@ -72,7 +72,7 @@ function camDebug()
 //;;
 function camDebugOnce()
 {
-	var str = debugGetCallerFuncName() + ": " + Array.prototype.join.call(arguments, " ");
+	const str = debugGetCallerFuncName() + ": " + Array.prototype.join.call(arguments, " ");
 	if (camDef(__camDebuggedOnce[str]))
 	{
 		return;
@@ -113,7 +113,7 @@ function camTraceOnce()
 	{
 		return;
 	}
-	var str = debugGetCallerFuncName() + ": " + Array.prototype.join.call(arguments, " ");
+	const str = debugGetCallerFuncName() + ": " + Array.prototype.join.call(arguments, " ");
 	if (camDef(__camTracedOnce[str]))
 	{
 		return;
@@ -140,7 +140,7 @@ function __camUpdateMarkedTiles()
 	hackMarkTiles();
 	if (camIsCheating() && camDef(__camMarkedTiles))
 	{
-		for (var label in __camMarkedTiles)
+		for (const label in __camMarkedTiles)
 		{
 			hackMarkTiles(label);
 		}
@@ -158,7 +158,7 @@ function __camGenericDebug(flag, func, args, err, bt)
 {
 	if (camDef(bt) && bt)
 	{
-		for (var i = bt.length - 1; i >= 0; --i)
+		for (let i = bt.length - 1; i >= 0; --i)
 		{
 			debug("STACK: from", [bt[i]]);
 		}
@@ -167,7 +167,7 @@ function __camGenericDebug(flag, func, args, err, bt)
 	{
 		func = "<anonymous>";
 	}
-	var str = flag + ": " + func + ": " + Array.prototype.join.call(args, " ");
+	const str = flag + ": " + func + ": " + Array.prototype.join.call(args, " ");
 	debug(str);
 	if (camDef(err) && err)
 	{

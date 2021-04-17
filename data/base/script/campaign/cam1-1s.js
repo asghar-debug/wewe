@@ -1,7 +1,7 @@
 include("script/campaign/libcampaign.js");
 
-var cheat;
-var powModVideoPlayed;
+let cheat;
+let powModVideoPlayed;
 
 function eventChat(from, to, message)
 {
@@ -27,8 +27,8 @@ function secondVideo()
 //Has player built the power module?
 function powerModuleBuilt()
 {
-	var gens = enumStruct(CAM_HUMAN_PLAYER, POWER_GEN, false);
-	for (var x = 0, l = gens.length; x < l; ++x)
+	const gens = enumStruct(CAM_HUMAN_PLAYER, POWER_GEN, false);
+	for (let x = 0, l = gens.length; x < l; ++x)
 	{
 		if ((gens[x].modules > 0) && (gens[x].status === BUILT))
 		{

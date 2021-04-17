@@ -40,7 +40,7 @@ function grantStartTech()
 	];
 
 	camCompleteRequiredResearch(TECH, CAM_HUMAN_PLAYER);
-	for (var i = 0, l = STRUCTS.length; i < l; ++i)
+	for (let i = 0, l = STRUCTS.length; i < l; ++i)
 	{
 		enableStructure(STRUCTS[i], CAM_HUMAN_PLAYER);
 	}
@@ -124,8 +124,8 @@ function activateDefenders()
 function eventStartLevel()
 {
 	camSetStandardWinLossConditions(CAM_VICTORY_STANDARD, undefined);
-	var startpos = getObject("startPosition");
-	var lz = getObject("landingZone");
+	const startpos = getObject("startPosition");
+	const lz = getObject("landingZone");
 	centreView(startpos.x, startpos.y);
 	setNoGoArea(lz.x, lz.y, lz.x2, lz.y2, CAM_HUMAN_PLAYER);
 

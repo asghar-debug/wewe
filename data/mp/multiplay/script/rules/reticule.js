@@ -1,12 +1,12 @@
 function reticuleManufactureCheck()
 {
-	var structureComplete = false;
-	var facs = [FACTORY, CYBORG_FACTORY, VTOL_FACTORY,];
+	let structureComplete = false;
+	const facs = [FACTORY, CYBORG_FACTORY, VTOL_FACTORY,];
 
-	for (var i = 0, len = facs.length; i < len; ++i)
+	for (let i = 0, len = facs.length; i < len; ++i)
 	{
-		var onMapFacs = enumStruct(selectedPlayer, facs[i]);
-		for (var j = 0, len2 = onMapFacs.length; j < len2; ++j)
+		const onMapFacs = enumStruct(selectedPlayer, facs[i]);
+		for (let j = 0, len2 = onMapFacs.length; j < len2; ++j)
 		{
 			if (onMapFacs[j].status === BUILT)
 			{
@@ -28,13 +28,13 @@ function reticuleManufactureCheck()
 
 function reticuleResearchCheck()
 {
-	var structureComplete = false;
-	var labs = [RESEARCH_LAB,];
+	let structureComplete = false;
+	const labs = [RESEARCH_LAB,];
 
-	for (var i = 0, len = labs.length; i < len; ++i)
+	for (let i = 0, len = labs.length; i < len; ++i)
 	{
-		var onMapResLabs = enumStruct(selectedPlayer, labs[i]);
-		for (var j = 0, len2 = onMapResLabs.length; j < len2; ++j)
+		const onMapResLabs = enumStruct(selectedPlayer, labs[i]);
+		for (let j = 0, len2 = onMapResLabs.length; j < len2; ++j)
 		{
 			if (onMapResLabs[j].status === BUILT)
 			{
@@ -67,13 +67,13 @@ function reticuleBuildCheck()
 
 function reticuleDesignCheck()
 {
-	var structureComplete = false;
-	var HQS = [HQ,];
+	let structureComplete = false;
+	const HQS = [HQ,];
 
-	for (var i = 0, len = HQS.length; i < len; ++i)
+	for (let i = 0, len = HQS.length; i < len; ++i)
 	{
-		var onMapHQ = enumStruct(selectedPlayer, HQS[i]);
-		for (var j = 0, len2 = onMapHQ.length; j < len2; ++j)
+		const onMapHQ = enumStruct(selectedPlayer, HQS[i]);
+		for (let j = 0, len2 = onMapHQ.length; j < len2; ++j)
 		{
 			if (onMapHQ[j].status === BUILT)
 			{
@@ -119,7 +119,7 @@ function setMainReticule()
 
 function reticuleUpdate(obj, eventType)
 {
-	var update_reticule = false;
+	let update_reticule = false;
 
 	if (eventType === TRANSFER_LIKE_EVENT)
 	{

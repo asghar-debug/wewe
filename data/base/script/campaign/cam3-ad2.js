@@ -16,9 +16,9 @@ const NEXUS_RES = [
 const VTOL_POSITIONS = [
 	"vtolAppearPosW", "vtolAppearPosE",
 ];
-var winFlag;
-var mapLimit;
-var videoInfo; //holds some info about when to play a video.
+let winFlag;
+let mapLimit;
+let videoInfo; //holds some info about when to play a video.
 
 //Remove Nexus VTOL droids.
 camAreaEvent("vtolRemoveZone", function(droid)
@@ -37,18 +37,17 @@ camAreaEvent("vtolRemoveZone", function(droid)
 //Return a random assortment of droids with the given templates.
 function randomTemplates(list)
 {
-	var i = 0;
-	var extras = [cTempl.nxmsens, cTempl.nxmsamh];
-	var droids = [];
-	var size = 12 + camRand(4); //Max of 15.
+	const extras = [cTempl.nxmsens, cTempl.nxmsamh];
+	const droids = [];
+	const size = 12 + camRand(4); //Max of 15.
 
-	for (i = 0; i < size; ++i)
+	for (let i = 0; i < size; ++i)
 	{
 		droids.push(list[camRand(list.length)]);
 	}
 
 	//Vtol strike sensor and vindicator hovers.
-	for (i = 0; i < 4; ++i)
+	for (let i = 0; i < 4; ++i)
 	{
 		droids.push(extras[camRand(extras.length)]);
 	}
@@ -59,15 +58,15 @@ function randomTemplates(list)
 //Chose a random spawn point for the VTOLs.
 function vtolAttack()
 {
-	var list = [cTempl.nxmheapv, cTempl.nxlpulsev];
+	const list = [cTempl.nxmheapv, cTempl.nxlpulsev];
 	camSetVtolData(NEXUS, VTOL_POSITIONS, "vtolRemovePos", list, camChangeOnDiff(camMinutesToMilliseconds(3)));
 }
 
 //Chose a random spawn point to send ground reinforcements.
 function phantomFactorySpawn()
 {
-	var list;
-	var chosenFactory;
+	let list;
+	let chosenFactory;
 
 	switch (camRand(3))
 	{
@@ -100,8 +99,8 @@ function phantomFactorySpawn()
 //when no target is found in the area.
 function vaporizeTarget()
 {
-	var target;
-	var targets = enumArea(0, Y_SCROLL_LIMIT, mapWidth, Math.floor(mapLimit), CAM_HUMAN_PLAYER, false).filter(function(obj) {
+	let target;
+	const targets = enumArea(0, Y_SCROLL_LIMIT, mapWidth, Math.floor(mapLimit), CAM_HUMAN_PLAYER, false).filter(function(obj) {
 		return obj.type === DROID || obj.type === STRUCTURE;
 	});
 
@@ -120,8 +119,8 @@ function vaporizeTarget()
 	}
 	else
 	{
-		var dr = targets.filter(function(obj) { return obj.type === DROID; });
-		var st = targets.filter(function(obj) { return obj.type === STRUCTURE; });
+		const dr = targets.filter(function(obj) { return obj.type === DROID; });
+		const st = targets.filter(function(obj) { return obj.type === STRUCTURE; });
 
 		if (dr.length)
 		{
@@ -164,14 +163,14 @@ function laserSatFuzzyStrike(obj)
 {
 	const LOC = camMakePos(obj);
 	//Initially lock onto target
-	var xCoord = LOC.x;
-	var yCoord = LOC.y;
+	let xCoord = LOC.x;
+	let yCoord = LOC.y;
 
 	//Introduce some randomness. More accurate than last mission.
 	if (camRand(101) < 33)
 	{
-		var xRand = camRand(2);
-		var yRand = camRand(2);
+		const xRand = camRand(2);
+		const yRand = camRand(2);
 		xCoord = camRand(2) ? LOC.x - xRand : LOC.x + xRand;
 		yCoord = camRand(2) ? LOC.y - yRand : LOC.y + yRand;
 	}
@@ -217,7 +216,7 @@ function laserSatFuzzyStrike(obj)
 //Play videos and allow winning once the final one is researched.
 function eventResearched(research, structure, player)
 {
-	for (var i = 0, l = videoInfo.length; i < l; ++i)
+	for (let i = 0, l = videoInfo.length; i < l; ++i)
 	{
 		if (research.name === videoInfo[i].res && !videoInfo[i].played)
 		{
@@ -270,8 +269,8 @@ function eventStartLevel()
 {
 	camSetExtraObjectiveMessage(_("Protect the missile silos and research for the missile codes"));
 
-	var startpos = getObject("startPosition");
-	var lz = getObject("landingZone");
+	const startpos = getObject("startPosition");
+	const lz = getObject("landingZone");
 	mapLimit = 137.0;
 	winFlag = false;
 	videoInfo = [
@@ -288,8 +287,8 @@ function eventStartLevel()
 	setScrollLimits(0, Y_SCROLL_LIMIT, 64, 256);
 
 	//Destroy everything above limits
-	var destroyZone = enumArea(0, 0, 64, Y_SCROLL_LIMIT, CAM_HUMAN_PLAYER, false);
-	for (var i = 0, l = destroyZone.length; i < l; ++i)
+	const destroyZone = enumArea(0, 0, 64, Y_SCROLL_LIMIT, CAM_HUMAN_PLAYER, false);
+	for (let i = 0, l = destroyZone.length; i < l; ++i)
 	{
 		camSafeRemoveObject(destroyZone[i], false);
 	}
@@ -299,7 +298,7 @@ function eventStartLevel()
 	setMissionTime(camMinutesToSeconds(5));
 	enableResearch("R-Sys-Resistance", CAM_HUMAN_PLAYER);
 
-	var enemyLz = getObject("NXlandingZone");
+	const enemyLz = getObject("NXlandingZone");
 	setNoGoArea(enemyLz.x, enemyLz.y, enemyLz.x2, enemyLz.y2, NEXUS);
 
 	camCompleteRequiredResearch(NEXUS_RES, NEXUS);

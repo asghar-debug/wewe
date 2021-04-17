@@ -24,8 +24,8 @@ _global.iHaveVtol = function() {
 }
 
 _global.iHaveArty = function() {
-	for (var stat in weaponStats)
-		for (var i = 0; i < weaponStats[stat].defenses.length; ++i)
+	for (const stat in weaponStats)
+		for (let i = 0; i < weaponStats[stat].defenses.length; ++i)
 			if (weaponStats[stat].defenses[i].defrole === DEFROLE.ARTY)
 				if (countStruct(weaponStats[stat].defenses[i].stat) > 0)
 					return true;
@@ -66,7 +66,7 @@ _global.structListLimit = function(list) {
 }
 
 _global.guessWeaponRole = function (name) {
-	for (var stat in weaponStats) {
+	for (const stat in weaponStats) {
 		if (
 			weaponStats[stat].weapons.someProperty("stat", name) ||
 			weaponStats[stat].vtols.someProperty("stat", name) ||
@@ -79,7 +79,7 @@ _global.guessWeaponRole = function (name) {
 
 function guessWeaponMicro(name) {
 	function uncached() {
-		for (var stat in weaponStats)
+		for (const stat in weaponStats)
 		{
 			if (weaponStats[stat].weapons.someProperty("stat", name))
 				return weaponStats[stat].micro;
@@ -91,8 +91,8 @@ function guessWeaponMicro(name) {
 }
 
 _global.guessDroidMicro = function(droid) {
-	for (var i = 0; i < droid.weapons.length; ++i) {
-		var ret = guessWeaponMicro(droid.weapons[i].name);
+	for (let i = 0; i < droid.weapons.length; ++i) {
+		const ret = guessWeaponMicro(droid.weapons[i].name);
 		if (ret !== MICRO.RANGED)
 			return ret;
 	}
@@ -100,7 +100,7 @@ _global.guessDroidMicro = function(droid) {
 }
 
 _global.guessBodyArmor = function(name) {
-    var body = bodyStats.filterProperty("stat", name).last()
+    const body = bodyStats.filterProperty("stat", name).last()
     if (defined(body))
         return body.armor;
     else
@@ -113,7 +113,7 @@ function weaponPathIsAvailable(path, objectType, defrole) {
 			return path.weapons.some(function(val) { return componentAvailable(val.stat); })
 		case 1:
 			return path.templates.some(function(val) {
-				for (var i = 0; i < val.weapons.length; ++i)
+				for (let i = 0; i < val.weapons.length; ++i)
 					if (!componentAvailable(val.weapons[i]))
 						return false;
 				return componentAvailable(val.body) && componentAvailable(val.prop);
@@ -134,13 +134,13 @@ _global.getProductionPaths = function() {
 }
 
 _global.chooseAvailableWeaponPathByRoleRatings = function(paths, rating, objectType, defrole) {
-	var minDist = Infinity, minPath;
+	let minDist = Infinity, minPath;
 	paths.forEach(function(path) {
 		if (!weaponPathIsAvailable(path, objectType, defrole))
 			return;
-		var dist = 0;
-		for (var i = 0; i < ROLE.LENGTH; ++i) {
-			var newDist = Math.abs(rating[i] - path.roles[i])
+		let dist = 0;
+		for (let i = 0; i < ROLE.LENGTH; ++i) {
+			const newDist = Math.abs(rating[i] - path.roles[i])
 			if (newDist > dist)
 				dist = newDist;
 		}
@@ -172,7 +172,7 @@ _global.propulsionStatsToResList = function(usage) {
 _global.weaponStatsToResList = function(path, objType) {
 	if (!defined(path))
 		return [];
-	var ret = [];
+	let ret = [];
 	switch(objType) {
 		case 0:
 			ret = statsToResList(path.weapons); break;
@@ -204,7 +204,7 @@ _global.filterDataByFlag = function(data, attr_name, flag) {
 }
 
 _global.filterBodyStatsByUsage = function(usage, armor) {
-	var data;
+	let data;
     if (defined(armor))
         data = filterDataByFlag(bodyStats, 'armor', armor)
     else
@@ -213,7 +213,7 @@ _global.filterBodyStatsByUsage = function(usage, armor) {
 }
 
 _global.getPropulsionStatsComponents = function(usage) {
-    var data = filterDataByFlag(propulsionStats, 'usage', usage)
+	const data = filterDataByFlag(propulsionStats, 'usage', usage)
 	return data.map(function(val) { return val.stat; }).reverse()
 }
 
@@ -224,8 +224,8 @@ _global.getPropulsionStatsComponents = function(usage) {
 _global.weaponStatsToDefenses = function(stats, defrole) {
 	if (!defined(stats))
 		return [];
-	var ret = [];
-	for (var i = 0; i < stats.defenses.length; ++i)
+	const ret = [];
+	for (let i = 0; i < stats.defenses.length; ++i)
 		if (!defined(defrole) || stats.defenses[i].defrole === defrole)
 			ret.push(stats.defenses[i].stat);
 	// reverse not needed here

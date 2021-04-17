@@ -69,7 +69,7 @@ function cam_eventChat(from, to, message)
 	}
 	if (message === "deity")
 	{
-		for (var blabel in __camEnemyBases)
+		for (const blabel in __camEnemyBases)
 		{
 			camDetectEnemyBase(blabel);
 		}
@@ -78,14 +78,14 @@ function cam_eventChat(from, to, message)
 	{
 		while (true) // eslint-disable-line no-constant-condition
 		{
-			var research = enumResearch();
+			const research = enumResearch();
 			if (research.length === 0)
 			{
 				break;
 			}
-			for (var i = 0, len = research.length; i < len; ++i)
+			for (let i = 0, len = research.length; i < len; ++i)
 			{
-				var researchName = research[i].name;
+				const researchName = research[i].name;
 				completeResearch(researchName, CAM_HUMAN_PLAYER);
 			}
 		}
@@ -249,7 +249,7 @@ function cam_eventMissionTimeout()
 	}
 	else
 	{
-		var won = camCheckExtraObjective();
+		const won = camCheckExtraObjective();
 		if (!won)
 		{
 			__camGameLost();
@@ -270,8 +270,8 @@ function cam_eventAttacked(victim, attacker)
 			if (victim.group === null)
 			{
 				const DEFAULT_RADIUS = 6;
-				var loc = {x: victim.x, y: victim.y};
-				var droids = enumRange(loc.x, loc.y, DEFAULT_RADIUS, victim.player, false).filter(function(obj) {
+				const loc = {x: victim.x, y: victim.y};
+				const droids = enumRange(loc.x, loc.y, DEFAULT_RADIUS, victim.player, false).filter(function(obj) {
 					return (obj.type === DROID &&
 						obj.group === null &&
 						(obj.canHitGround || obj.isSensor) &&
@@ -320,9 +320,9 @@ function cam_eventGameLoaded()
 
 	//Need to set the scavenger kevlar vests when loading a save from later Alpha
 	//missions or else it reverts to the original texture.
-	for (var i = 0, l = SCAV_KEVLAR_MISSIONS.length; i < l; ++i)
+	for (let i = 0, l = SCAV_KEVLAR_MISSIONS.length; i < l; ++i)
 	{
-		var mission = SCAV_KEVLAR_MISSIONS[i];
+		const mission = SCAV_KEVLAR_MISSIONS[i];
 		if (__camNextLevel === mission)
 		{
 			if (tilesetType === "ARIZONA")
@@ -353,7 +353,7 @@ function cam_eventObjectTransfer(obj, from)
 {
 	if (from === CAM_HUMAN_PLAYER && obj.player === NEXUS && __camNexusActivated === true)
 	{
-		var snd;
+		let snd;
 		if (obj.type === STRUCTURE)
 		{
 			if (obj.stattype === DEFENSE)

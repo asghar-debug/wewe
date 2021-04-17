@@ -86,7 +86,7 @@ function camMakePos(xx, yy)
 	{
 		return undefined;
 	}
-	var obj = xx;
+	let obj = xx;
 	if (camIsString(xx))
 	{
 		obj = getObject(xx);
@@ -133,7 +133,7 @@ function camDist(x1, y1, x2, y2)
 	{
 		return distBetweenTwoPoints(x1, y1, x2, y2);
 	}
-	var pos2 = camMakePos(x2, y2);
+	const pos2 = camMakePos(x2, y2);
 	if (!camDef(pos2)) // pos1, pos2
 	{
 		return distBetweenTwoPoints(x1.x, x1.y, y1.x, y1.y);
@@ -173,11 +173,11 @@ function camPlayerMatchesFilter(player, filter)
 //;;
 function camRemoveDuplicates(array)
 {
-	var prims = {"boolean":{}, "number":{}, "string":{}};
-	var objs = [];
+	const prims = {"boolean":{}, "number":{}, "string":{}};
+	const objs = [];
 
 	return array.filter(function(item) {
-		var type = typeof item;
+		const type = typeof item;
 		if (type in prims)
 		{
 			return prims[type].hasOwnProperty(item) ? false : (prims[type][item] = true);
@@ -199,11 +199,11 @@ function camCountStructuresInArea(lab, player)
 	{
 		player = CAM_HUMAN_PLAYER;
 	}
-	var list = enumArea(lab, player, false);
-	var ret = 0;
-	for (var i = 0, l = list.length; i < l; ++i)
+	const list = enumArea(lab, player, false);
+	let ret = 0;
+	for (let i = 0, l = list.length; i < l; ++i)
 	{
-		var object = list[i];
+		const object = list[i];
 		if (object.type === STRUCTURE && object.stattype !== WALL && object.status === BUILT)
 		{
 			++ret;
@@ -218,7 +218,7 @@ function camCountStructuresInArea(lab, player)
 //;;
 function camChangeOnDiff(num)
 {
-	var modifier = 0;
+	let modifier = 0;
 
 	switch (difficulty)
 	{
@@ -276,8 +276,8 @@ function camMakeGroup(what, filter)
 	{
 		filter = ENEMIES;
 	}
-	var array;
-	var obj;
+	let array;
+	let obj;
 	if (camIsString(what)) // label
 	{
 		obj = getObject(what);
@@ -318,10 +318,10 @@ function camMakeGroup(what, filter)
 	}
 	if (camDef(array))
 	{
-		var group = camNewGroup();
-		for (var i = 0, l = array.length; i < l; ++i)
+		const group = camNewGroup();
+		for (let i = 0, l = array.length; i < l; ++i)
 		{
-			var o = array[i];
+			const o = array[i];
 			if (!camDef(o) || !o)
 			{
 				camDebug("Trying to add", o);
@@ -343,9 +343,9 @@ function camMakeGroup(what, filter)
 //;;
 function camBreakAlliances()
 {
-	for (var i = 0; i < CAM_MAX_PLAYERS; ++i)
+	for (let i = 0; i < CAM_MAX_PLAYERS; ++i)
 	{
-		for (var c = 0; c < CAM_MAX_PLAYERS; ++c)
+		for (let c = 0; c < CAM_MAX_PLAYERS; ++c)
 		{
 			if (i !== c && allianceExistsBetween(i, c) === true)
 			{
@@ -365,14 +365,14 @@ function __camGlobalContext()
 function __camFindClusters(list, size)
 {
 	// The good old cluster analysis algorithm taken from NullBot AI.
-	var ret = { clusters: [], xav: [], yav: [], maxIdx: 0, maxCount: 0 };
-	for (var i = list.length - 1; i >= 0; --i)
+	const ret = { clusters: [], xav: [], yav: [], maxIdx: 0, maxCount: 0 };
+	for (let i = list.length - 1; i >= 0; --i)
 	{
-		var x = list[i].x;
-		var y = list[i].y;
-		var found = false;
-		var n = 0;
-		for (var j = 0; j < ret.clusters.length; ++j)
+		const x = list[i].x;
+		const y = list[i].y;
+		let found = false;
+		let n = 0;
+		for (let j = 0; j < ret.clusters.length; ++j)
 		{
 			if (camDist(ret.xav[j], ret.yav[j], x, y) < size)
 			{
@@ -418,7 +418,7 @@ function __camTick()
 //Reset AI power back to highest storage possible.
 function __camAiPowerReset()
 {
-	for (var i = 1; i < CAM_MAX_PLAYERS; ++i)
+	for (let i = 1; i < CAM_MAX_PLAYERS; ++i)
 	{
 		setPower(AI_POWER, i);
 	}
