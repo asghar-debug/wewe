@@ -110,7 +110,8 @@ enum MESSAGE_TYPES
 	GAME_GAME_TIME,                 ///< Game time. Used for synchronising, so that all messages are executed at the same gameTime on all clients.
 	GAME_PLAYER_LEFT,               ///< Player has left or dropped.
 	GAME_DROIDDISEMBARK,            ///< droid disembarked from a Transporter
-	GAME_SYNC_REQUEST,		///< Game event generated from scripts that is meant to be synced
+	GAME_SYNC_REQUEST,              ///< Game event generated from scripts that is meant to be synced
+
 	// The following messages are used for debug mode.
 	GAME_DEBUG_MODE,                ///< Request enable/disable debug mode.
 	GAME_DEBUG_ADD_DROID,           ///< Add droid.
@@ -120,6 +121,11 @@ enum MESSAGE_TYPES
 	GAME_DEBUG_REMOVE_STRUCTURE,    ///< Remove structure.
 	GAME_DEBUG_REMOVE_FEATURE,      ///< Remove feature.
 	GAME_DEBUG_FINISH_RESEARCH,     ///< Research has been completed.
+
+	// Unit/control sharing
+	GAME_UNIT_SHARE,                ///< Player wants to start/stop sharing the unit control with an another player
+	GAME_MANUFACTURE_SHARE,         ///< Player wants to start/stop sharing the factory controls with an another player
+
 	// End of debug messages.
 	GAME_MAX_TYPE                   ///< Maximum+1 valid GAME_ type, *MUST* be last.
 };
@@ -239,6 +245,12 @@ enum class NET_LOBBY_OPT_FIELD
 	MAX
 };
 
+struct PlayerShareStatus
+{
+	bool bUnits;
+	bool bManufacture;
+};
+
 // ////////////////////////////////////////////////////////////////////////
 // Player information. Filled when players join, never re-ordered. selectedPlayer global points to
 // currently controlled player.
@@ -259,26 +271,19 @@ struct PLAYER
 	bool                autoGame;           ///< if we are running a autogame (AI controls us)
 	std::vector<WZFile> wzFiles;            ///< for each player, we keep track of map/mod download progress
 	char                IPtextAddress[40];  ///< IP of this player
-	FactionID			faction;			///< which faction the player has
+	FactionID           faction;            ///< which faction the player has
 
-	void resetAll()
-	{
-		name[0] = '\0';
-		position = -1;
-		colour = 0;
-		allocated = false;
-		heartattacktime = 0;
-		heartbeat = false;
-		kick = false;
-		connection = -1;
-		team = -1;
-		ready = false;
-		ai = 0;
-		difficulty = AIDifficulty::DISABLED;
-		autoGame = false;
-		IPtextAddress[0] = '\0';
-		faction = FACTION_NORMAL;
-	}
+	std::vector<PlayerShareStatus> sharing = std::vector<PlayerShareStatus>(MAX_PLAYERS, { false, false });
+
+	void resetAll();
+
+	bool isSharingUnitsWith(const unsigned int other) const;
+
+	bool isSharingManufactureWith(const unsigned int other) const;
+
+	void setUnitSharingState(const unsigned int other, const bool bState);
+
+	void setManufactureSharingState(const unsigned int other, const bool bState);
 };
 
 struct PlayerReference;
@@ -308,6 +313,7 @@ struct NETPLAY
 
 	NETPLAY();
 };
+
 
 struct PLAYER_IP
 {

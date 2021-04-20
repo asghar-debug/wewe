@@ -258,6 +258,61 @@ NETPLAY::NETPLAY()
 	}
 }
 
+void PLAYER::resetAll()
+{
+	name[0] = '\0';
+	position = -1;
+	colour = 0;
+	allocated = false;
+	heartattacktime = 0;
+	heartbeat = false;
+	kick = false;
+	connection = -1;
+	team = -1;
+	ready = false;
+	ai = 0;
+	difficulty = AIDifficulty::DISABLED;
+	autoGame = false;
+	IPtextAddress[0] = '\0';
+	faction = FACTION_NORMAL;
+	std::fill(sharing.begin(), sharing.end(), PlayerShareStatus({ false, false }));
+}
+
+bool PLAYER::isSharingUnitsWith(const unsigned int other) const
+{
+	return sharing[other].bUnits;
+}
+
+void PLAYER::setUnitSharingState(const unsigned int other, const bool bState)
+{
+	const bool bOnSameTeam = NetPlay.players[selectedPlayer].team == NetPlay.players[other].team;
+	if (!bOnSameTeam)
+	{
+		debug(LOG_ERROR, "Cannot share units: %d is not on your team!", other);
+		return;
+	}
+
+	sharing[other].bUnits = bState;
+}
+
+bool PLAYER::isSharingManufactureWith(const unsigned int other) const
+{
+	return sharing[other].bManufacture;
+}
+
+void PLAYER::setManufactureSharingState(const unsigned int other, const bool bState)
+{
+	const bool bOnSameTeam = NetPlay.players[selectedPlayer].team == NetPlay.players[other].team;
+	if (!bOnSameTeam)
+	{
+		debug(LOG_ERROR, "Cannot share manufacture: %d is not on your team!", other);
+		return;
+	}
+
+	sharing[other].bManufacture = bState;
+}
+
+
 bool NETisCorrectVersion(uint32_t game_version_major, uint32_t game_version_minor)
 {
 	return (uint32_t)NETCODE_VERSION_MAJOR == game_version_major && (uint32_t)NETCODE_VERSION_MINOR == game_version_minor;
@@ -524,6 +579,16 @@ static void NETSendNPlayerInfoTo(uint32_t *index, uint32_t indexLen, unsigned to
 		NETint8_t(&NetPlay.players[index[n]].ai);
 		NETint8_t(reinterpret_cast<int8_t*>(&NetPlay.players[index[n]].difficulty));
 		NETuint8_t(reinterpret_cast<uint8_t *>(&NetPlay.players[index[n]].faction));
+
+		uint32_t shareCount = NetPlay.players[index[n]].sharing.size();
+		NETuint32_t(&shareCount);
+		for (unsigned int other = 0; other < shareCount; ++other)
+		{
+			bool bUnits = NetPlay.players[index[n]].sharing[other].bUnits;
+			bool bManufacture = NetPlay.players[index[n]].sharing[other].bManufacture;
+			NETbool(&bUnits);
+			NETbool(&bManufacture);
+		}
 	}
 	NETend();
 	ActivityManager::instance().updateMultiplayGameData(game, ingame, NETGameIsLocked());
@@ -1715,9 +1780,14 @@ static bool NETprocessSystemMessage(NETQUEUE playerQueue, uint8_t type)
 			NETbeginDecode(playerQueue, NET_SHARE_GAME_QUEUE);
 			NETuint8_t(&player);
 			NETuint32_t(&num);
-			bool isSentByCorrectClient = responsibleFor(playerQueue.index, player);
-			isSentByCorrectClient = isSentByCorrectClient || (playerQueue.index == NET_HOST_ONLY && playerQueue.index != selectedPlayer);  // Let host spoof other people's NET_SHARE_GAME_QUEUE messages, but not our own. This allows the host to spoof a GAME_PLAYER_LEFT message (but spoofing any message when the player is still there will fail with desynch).
-			if (!isSentByCorrectClient || player >= MAX_PLAYERS)
+			const bool bIsHostAndSpoofingAnotherPlayer = playerQueue.index == NET_HOST_ONLY && playerQueue.index != selectedPlayer; // Let host spoof other people's NET_SHARE_GAME_QUEUE messages, but not our own. This allows the host to spoof a GAME_PLAYER_LEFT message (but spoofing any message when the player is still there will fail with desynch).
+			const bool bIsSentByCorrectClient = responsibleFor(playerQueue.index, player) || bIsHostAndSpoofingAnotherPlayer;
+
+			const bool bIsSentByShareUnitsTarget = NetPlay.players[player].isSharingUnitsWith(selectedPlayer);
+			const bool bIsSentByShareManufactureTarget = NetPlay.players[player].isSharingManufactureWith(selectedPlayer);
+			const bool bIsSharing = bIsSentByShareUnitsTarget || bIsSentByShareManufactureTarget;
+
+			if ((!bIsSentByCorrectClient && !bIsSharing) || player >= MAX_PLAYERS)
 			{
 				break;
 			}
@@ -1725,8 +1795,20 @@ static bool NETprocessSystemMessage(NETQUEUE playerQueue, uint8_t type)
 			{
 				NETnetMessage(&message);
 
-				NETinsertMessageFromNet(NETgameQueue(player), message);
-				NETlogPacket(message->type, static_cast<uint32_t>(message->rawLen()), true);
+				// Always allow if sent by correct client. Only allow droid/structure messages for share targets.
+				bool bIsAllowedMessage = bIsSentByCorrectClient;
+				if (bIsSentByShareUnitsTarget) {
+					bIsAllowedMessage |= static_cast<MESSAGE_TYPES>(message->type) == MESSAGE_TYPES::GAME_DROIDINFO;
+				}
+				if (bIsSentByShareManufactureTarget) {
+					bIsAllowedMessage |= static_cast<MESSAGE_TYPES>(message->type) == MESSAGE_TYPES::GAME_STRUCTUREINFO;
+				}
+
+				if (bIsAllowedMessage)
+				{
+					NETinsertMessageFromNet(NETgameQueue(player), message);
+					NETlogPacket(message->type, static_cast<uint32_t>(message->rawLen()), true);
+				}
 
 				delete message;
 				message = nullptr;
@@ -1815,6 +1897,17 @@ static bool NETprocessSystemMessage(NETQUEUE playerQueue, uint8_t type)
 					NetPlay.players[index].ai = ai;
 					NetPlay.players[index].difficulty = static_cast<AIDifficulty>(difficulty);
 					NetPlay.players[index].faction = newFactionId.value();
+					NetPlay.players[index].sharing = std::vector<PlayerShareStatus>(MAX_PLAYERS, { false, false });
+
+					uint32_t shareCount;
+					NETuint32_t(&shareCount);
+					for (unsigned int other = 0; other < shareCount; ++other)
+					{
+						bool bUnits, bManufacture;
+						NETbool(&bUnits);
+						NETbool(&bManufacture);
+						NetPlay.players[index].sharing[other] = { bUnits, bManufacture };
+					}
 				}
 
 				debug(LOG_NET, "%s for player %u (%s)", n == 0 ? "Receiving MSG_PLAYER_INFO" : "                      and", (unsigned int)index, NetPlay.players[index].allocated ? "human" : "AI");
@@ -1890,6 +1983,7 @@ static bool NETprocessSystemMessage(NETQUEUE playerQueue, uint8_t type)
 			debug(LOG_INFO, "Player %u has left the game.", index);
 			NETplayerLeaving(index);		// need to close socket for the player that left.
 			NETsetPlayerConnectionStatus(CONNECTIONSTATUS_PLAYER_LEAVING, index);
+			// TODO 823-share-unit-controls: clear any unit share statuses for the leaving player, if applicable
 			break;
 		}
 	case NET_GAME_FLAGS:
@@ -4392,7 +4486,7 @@ const char *messageTypeToString(unsigned messageType_)
 	case NET_KICK:                      return "NET_KICK";
 	case NET_FIREUP:                    return "NET_FIREUP";
 	case NET_COLOURREQUEST:             return "NET_COLOURREQUEST";
-	case NET_FACTIONREQUEST:             return "NET_FACTIONREQUEST";
+	case NET_FACTIONREQUEST:            return "NET_FACTIONREQUEST";
 	case NET_AITEXTMSG:                 return "NET_AITEXTMSG";
 	case NET_BEACONMSG:                 return "NET_BEACONMSG";
 	case NET_TEAMREQUEST:               return "NET_TEAMREQUEST";
@@ -4442,6 +4536,11 @@ const char *messageTypeToString(unsigned messageType_)
 	case GAME_DEBUG_REMOVE_STRUCTURE:   return "GAME_DEBUG_REMOVE_STRUCTURE";
 	case GAME_DEBUG_REMOVE_FEATURE:     return "GAME_DEBUG_REMOVE_FEATURE";
 	case GAME_DEBUG_FINISH_RESEARCH:    return "GAME_DEBUG_FINISH_RESEARCH";
+
+	// Unit/control sharing
+	case GAME_UNIT_SHARE:               return "GAME_UNIT_SHARE";
+	case GAME_MANUFACTURE_SHARE:        return "GAME_MANUFACTURE_SHARE";
+
 	// End of redundant messages.
 	case GAME_MAX_TYPE:                 return "GAME_MAX_TYPE";
 	}

@@ -24,7 +24,10 @@
 #ifndef __INCLUDED_SRC_OBJMEM_H__
 #define __INCLUDED_SRC_OBJMEM_H__
 
+#include <vector>
+
 #include "objectdef.h"
+#include "objiter.h"
 
 /* The lists of objects allocated */
 extern DROID			*apsDroidLists[MAX_PLAYERS];
@@ -37,6 +40,32 @@ extern FEATURE			*apsOilList[1];
 
 /* The list of destroyed objects */
 extern BASE_OBJECT	*psDestroyedObj;
+
+
+/* Convenient iterator over the droid lists. */
+class Droids
+{
+public:
+	/* Obtains a collection of droids available for the given player. Each player has their
+	   own droids that are always included in their droid collection. Other players' droids
+	   are available for a player only if the other player has shared their unit controls
+	   with the player in question (and if bIncludeShared is true).                         */
+	static Droids forPlayer(const unsigned int playerIndex, const bool bIncludeShared, const bool bSelectedOnly);
+
+public:
+	PlayerObjectIterator<DROID> begin() const;
+
+	PlayerObjectIterator<DROID> end() const;
+
+	unsigned int count() const;
+
+private:
+	explicit Droids(const std::vector<unsigned int> playerIndices, const bool bSelectedOnly);
+
+	const std::vector<unsigned int> playerIndices;
+	const bool bSelectedOnly;
+};
+
 
 /* Initialise the object heaps */
 bool objmemInitialise();

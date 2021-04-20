@@ -23,6 +23,8 @@
  * Object memory management functions.
  *
  */
+
+#include <vector>
 #include <string.h>
 
 #include "lib/framework/frame.h"
@@ -41,6 +43,7 @@
 #include "combat.h"
 #include "visibility.h"
 #include "qtscript.h"
+#include "objiter.h"
 
 // the initial value for the object ID
 #define OBJ_ID_INIT 20000
@@ -64,6 +67,55 @@ FLAG_POSITION	*apsFlagPosLists[MAX_PLAYERS];
 
 /* The list of destroyed objects */
 BASE_OBJECT		*psDestroyedObj = nullptr;
+
+PlayerObjectIterator<DROID> Droids::begin() const
+{
+	return PlayerObjectIterator<DROID>(0, playerIndices, bSelectedOnly, apsDroidLists);
+}
+
+PlayerObjectIterator<DROID> Droids::end() const
+{
+	return PlayerObjectIterator<DROID>(playerIndices.size(), playerIndices, bSelectedOnly, apsDroidLists);
+}
+
+unsigned int Droids::count() const
+{
+	unsigned int count = 0;
+	for (auto it = begin(); it != end(); ++it)
+	{
+		++count;
+	}
+
+	return count;
+}
+
+Droids::Droids(const std::vector<unsigned int> playerIndices, const bool bSelectedOnly)
+	: playerIndices(playerIndices)
+	, bSelectedOnly(bSelectedOnly)
+{
+}
+
+Droids Droids::forPlayer(const unsigned int playerIndex, const bool bIncludeShared, const bool bSelectedOnly)
+{
+	// TODO: The current implementation "hides" the inefficient loop-over-players'-droids implementation. Droid counts are relatively small, so this should not be an issue.
+	// 	   - bSelectedOnly can be made more efficient by keeping track of selections (in a list) instead of relying on psDroid->selected
+
+	std::vector<unsigned int> playerIndices = { playerIndex };
+	for (unsigned int other = 0; other < MAX_PLAYERS; ++other)
+	{
+		if (other == playerIndex)
+		{
+			continue;
+		}
+
+		if (NetPlay.players[other].isSharingUnitsWith(playerIndex))
+		{
+			playerIndices.push_back(other);
+		}
+	}
+
+	return Droids(playerIndices, bSelectedOnly);
+}
 
 /* Forward function declarations */
 #ifdef DEBUG
