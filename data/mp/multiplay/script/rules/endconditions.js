@@ -2,18 +2,18 @@
 // END CONDITIONS
 function checkEndConditions()
 {
-	var factories = countStruct("A0LightFactory") + countStruct("A0CyborgFactory");
-	var droids = countDroid(DROID_ANY);
+	let factories = countStruct("A0LightFactory") + countStruct("A0CyborgFactory");
+	let droids = countDroid(DROID_ANY);
 
 	// Losing Conditions
 	if (droids == 0 && factories == 0)
 	{
-		var gameLost = true;
+		let gameLost = true;
 
 		/* If teams enabled check if all team members have lost  */
 		if (alliancesType == ALLIANCES_TEAMS || alliancesType == ALLIANCES_UNSHARED)
 		{
-			for (var playnum = 0; playnum < maxPlayers; playnum++)
+			for (let playnum = 0; playnum < maxPlayers; playnum++)
 			{
 				if (playnum != selectedPlayer && allianceExistsBetween(selectedPlayer, playnum))
 				{
@@ -37,10 +37,10 @@ function checkEndConditions()
 	}
 
 	// Winning Conditions
-	var gamewon = true;
+	let gamewon = true;
 
 	// check if all enemies defeated
-	for (var playnum = 0; playnum < maxPlayers; playnum++)
+	for (let playnum = 0; playnum < maxPlayers; playnum++)
 	{
 		if (playnum != selectedPlayer && !allianceExistsBetween(selectedPlayer, playnum))	// checking enemy player
 		{

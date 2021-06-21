@@ -63,14 +63,14 @@ function personalityIsRocketMain()
 //Distance between an object and the Cobra base.
 function distanceToBase(obj1, obj2)
 {
-	var dist1 = distBetweenTwoPoints(MY_BASE.x, MY_BASE.y, obj1.x, obj1.y);
-	var dist2 = distBetweenTwoPoints(MY_BASE.x, MY_BASE.y, obj2.x, obj2.y);
+	const dist1 = distBetweenTwoPoints(MY_BASE.x, MY_BASE.y, obj1.x, obj1.y);
+	const dist2 = distBetweenTwoPoints(MY_BASE.x, MY_BASE.y, obj2.x, obj2.y);
 	return (dist1 - dist2);
 }
 
 function addDroidsToGroup(group, droids)
 {
-	for (var i = 0, d = droids.length; i < d; ++i)
+	for (let i = 0, d = droids.length; i < d; ++i)
 	{
 		groupAdd(group, droids[i]);
 	}
@@ -93,11 +93,11 @@ function rangeStep(player)
 			player = getMostHarmfulPlayer();
 		}
 
-		var highOil = highOilMap();
-		var targets = [];
-		var derr;
-		var struc = findNearestEnemyStructure(player);
-		var droid = findNearestEnemyDroid(player);
+		const highOil = highOilMap();
+		let targets = [];
+		let derr;
+		const struc = findNearestEnemyStructure(player);
+		const droid = findNearestEnemyDroid(player);
 
 		if (!highOil)
 		{
@@ -144,9 +144,9 @@ function playerAlliance(ally)
 		ally = false;
 	}
 
-	var players = [];
+	const players = [];
 
-	for (var i = 0; i < maxPlayers; ++i)
+	for (let i = 0; i < maxPlayers; ++i)
 	{
 		if (i === me)
 		{
@@ -183,8 +183,8 @@ function findLivingEnemies()
 {
 	function uncached()
 	{
-		var alive = [];
-		for (var x = 0; x < maxPlayers; ++x)
+		const alive = [];
+		for (let x = 0; x < maxPlayers; ++x)
 		{
 	 		if ((x !== me) && !allianceExistsBetween(x, me) && ((countDroid(DROID_ANY, x) > 0) || (enumStruct(x).length > 0)))
 			{
@@ -219,9 +219,9 @@ function getMostHarmfulPlayer()
 
 	function uncached()
 	{
-		var mostHarmful = 0;
-		var enemies = findLivingEnemies();
-		var allEnemies = playerAlliance(false);
+		let mostHarmful = 0;
+		const enemies = findLivingEnemies();
+		const allEnemies = playerAlliance(false);
 
 		if (enemies.length === 0)
 		{
@@ -233,7 +233,7 @@ function getMostHarmfulPlayer()
 			return 0; //If nothing to attack, then attack player 0 (happens only after winning).
 		}
 
-	 	for (var x = 0, c = enemies.length; x < c; ++x)
+	 	for (let x = 0, c = enemies.length; x < c; ++x)
 		{
 	 		if((grudgeCount[enemies[x]] >= 0) && (grudgeCount[enemies[x]] > grudgeCount[mostHarmful]))
 			{
@@ -259,12 +259,12 @@ function initializeGrudgeCounter()
 {
 	grudgeCount = [];
 
-	for (var i = 0; i < maxPlayers; ++i)
+	for (let i = 0; i < maxPlayers; ++i)
 	{
 		grudgeCount.push(0);
 	}
 
-	for (var i = 0; i < maxPlayers; ++i)
+	for (let i = 0; i < maxPlayers; ++i)
 	{
 		if ((!allianceExistsBetween(i, me)) && (i !== me))
 		{
@@ -283,7 +283,7 @@ function donateFromGroup(from, group)
 	if (isDefined(group))
 	{
 		const MIN_HEALTH = 80;
-		var chosenGroup;
+		let chosenGroup;
 
 		switch (group)
 		{
@@ -293,7 +293,7 @@ function donateFromGroup(from, group)
 			default: chosenGroup = enumGroup(attackGroup); break;
 		}
 
-		var droids = chosenGroup.filter(function(dr) { return (dr.health > MIN_HEALTH); });
+		const droids = chosenGroup.filter(function(dr) { return (dr.health > MIN_HEALTH); });
 		const CACHE_DROIDS = droids.length;
 
 		if (CACHE_DROIDS >= MIN_ATTACK_DROIDS)
@@ -308,7 +308,7 @@ function removeThisTimer(timer)
 {
 	if (timer instanceof Array)
 	{
-		for(var i = 0, l = timer.length; i < l; ++i)
+		for (let i = 0, l = timer.length; i < l; ++i)
 		{
 			removeTimer(timer[i]);
 		}
@@ -366,10 +366,10 @@ function initCobraGroups()
 	addDroidsToGroup(repairGroup, enumDroid(me, DROID_REPAIR));
 	addDroidsToGroup(artilleryGroup, enumDroid(me, DROID_WEAPON).filter(function(obj) { return obj.isCB; }));
 
-	var cons = enumDroid(me, DROID_CONSTRUCT);
-	for (var i = 0, l = cons.length; i < l; ++i)
+	const cons = enumDroid(me, DROID_CONSTRUCT);
+	for (let i = 0, l = cons.length; i < l; ++i)
 	{
-		var con = cons[i];
+		const con = cons[i];
 
 		eventDroidBuilt(con, null);
 	}
@@ -377,7 +377,7 @@ function initCobraGroups()
 
 function initCobraVars()
 {
-	var isHoverMap = checkIfSeaMap();
+	const isHoverMap = checkIfSeaMap();
 
 	lastMsg = "eventStartLevel";
 	lastMsgThrottle = 0;
@@ -413,8 +413,8 @@ function randomOffsetLocation(location)
 	{
 		const MAP_EDGE = 2;
 		const TILE_OFFSET_MAX = 3;
-		var newValueX = (random(100) < 50) ? location.x + random(TILE_OFFSET_MAX) : location.x - random(TILE_OFFSET_MAX);
-		var newValueY = (random(100) < 50) ? location.y + random(TILE_OFFSET_MAX) : location.y - random(TILE_OFFSET_MAX);
+		let newValueX = (random(100) < 50) ? location.x + random(TILE_OFFSET_MAX) : location.x - random(TILE_OFFSET_MAX);
+		let newValueY = (random(100) < 50) ? location.y + random(TILE_OFFSET_MAX) : location.y - random(TILE_OFFSET_MAX);
 
 		if (newValueX < MAP_EDGE)
 		{

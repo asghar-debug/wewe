@@ -5,9 +5,8 @@
 // and interesting game-play.
 ////////////////////////////////////////////////////////////////////////////////
 
-var branch; // what branch personality is being used. A string.
-var nexusBranch =
-{
+let branch; // what branch personality is being used. A string.
+const nexusBranch = {
      generic1:
      {
           "type": "land",

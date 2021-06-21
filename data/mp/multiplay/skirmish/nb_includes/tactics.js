@@ -10,23 +10,23 @@
 _global.MAX_GROUPS = maxPlayers;
 _global.miscGroup = MAX_GROUPS;
 _global.vtolGroup = miscGroup + 1;
-var groupInfo = [];
-var firstTimeHarass = true;
+const groupInfo = [];
+let firstTimeHarass = true;
 
 function GroupInfo() {
 	this.lastAttacked = undefined; // gameTime at the moment of the last combat
 }
 
 function safeGetObject(label) {
-	var obj = getObject(label);
+	const obj = getObject(label);
 	if (obj === null)
 		return undefined;
 	return obj;
 }
 
 function groupsBySize() {
-	var ret = [];
-	for (var i = 0; i < MAX_GROUPS; ++i)
+	const ret = [];
+	for (let i = 0; i < MAX_GROUPS; ++i)
 		if (isEnemy(i))
 			ret.push(i);
 	ret.sort(function(one, two) { return groupSize(two) - groupSize(one); });
@@ -34,16 +34,16 @@ function groupsBySize() {
 }
 
 function findLargestGroupIn(list) {
-	var sizes = []
-	for (var i = 0; i < MAX_GROUPS; ++i)
+	const sizes = []
+	for (let i = 0; i < MAX_GROUPS; ++i)
 		sizes[i] = 0;
 	list.forEach(function(object) {
 		if (!defined(object.group) || object.group < 0 && object.group >= MAX_GROUPS)
 			return;
 		++sizes[object.group];
 	});
-	var maxCount = 0, maxIdx = 0;
-	for (var i = 0; i < sizes.length; ++i)
+	let maxCount = 0, maxIdx = 0;
+	for (let i = 0; i < sizes.length; ++i)
 		if (sizes[i] > maxCount) {
 			maxCount = sizes[i];
 			maxIdx = i;
@@ -52,17 +52,17 @@ function findLargestGroupIn(list) {
 }
 
 function findNearestGroup(x, y) {
-	var ret = naiveFindClusters(enumDroid(me).filter(function(droid) {
+	const ret = naiveFindClusters(enumDroid(me).filter(function(droid) {
 		return !isVTOL(droid) && (droid.droidType === DROID_WEAPON || droid.droidType === DROID_CYBORG);
 	}), baseScale / 3);
 	if (ret.maxCount === 0)
 		return undefined;
-	var minDist = Infinity, minIdx;
-	var gr = [];
-	for (var i = 0; i < ret.clusters.length; ++i) {
+	let minDist = Infinity, minIdx;
+	let gr = [];
+	for (let i = 0; i < ret.clusters.length; ++i) {
 		gr[i] = findLargestGroupIn(ret.clusters[i]);
 		if (groupSize(gr[i]) > attackGroupSize()) {
-			var dist = distance(ret.xav[i], ret.yav[i], x, y);
+			const dist = distance(ret.xav[i], ret.yav[i], x, y);
 			if (dist < minDist) {
 				minDist = dist;
 				minIdx = i;
@@ -79,7 +79,7 @@ function findNearestGroup(x, y) {
 
 function targetSuitableForHarass(object) {
 	function uncached() {
-		var ret = enumRange(object.x, object.y, baseScale / 2, ENEMIES, false).filter(function(obj) {
+		const ret = enumRange(object.x, object.y, baseScale / 2, ENEMIES, false).filter(function(obj) {
 			return !(obj.type == STRUCTURE && obj.stattype != DEFENSE);
 		}).length;
 		return ret <= groupSize(miscGroup);
@@ -109,8 +109,8 @@ function vtolTargetLabel() {
 function findTarget(gr) {
 	if (enumLivingPlayers().filter(isEnemy).length === 0)
 		return undefined;
-	var obj = safeGetObject(groupMicroTargetLabel(gr));
-	var obj2 = safeGetObject(groupTargetLabel(gr));
+	let obj = safeGetObject(groupMicroTargetLabel(gr));
+	const obj2 = safeGetObject(groupTargetLabel(gr));
 	getGroupInfo(gr);
 	if (gameTime > groupInfo[gr].lastAttacked + 10000 && defined(obj2) && obj2.type === POSITION)
 		removeLabel(groupMicroTargetLabel(gr));
@@ -126,7 +126,7 @@ function findTarget(gr) {
 	}
 	// find harass targets for the misc group
 	if (gr === miscGroup) {
-		var list = enumStructList(miscTargets, enumLivingPlayers().filter(isEnemy).random());
+		let list = enumStructList(miscTargets, enumLivingPlayers().filter(isEnemy).random());
 		powerUps.forEach(function(stat) { // pick up oil drums and artifacts
 			list = list.concat(enumFeature(-1, stat));
 		});
@@ -145,7 +145,7 @@ function findTarget(gr) {
 		}
 	}
 	// fund structure targets
-	var list = enumStructList(targets, gr);
+	let list = enumStructList(targets, gr);
 	if (list.length > 0)
 		obj = list.random();
 	else {
@@ -170,18 +170,18 @@ function groupInDanger(gr) {
 function regroup(gr) {
 	if (inPanic())
 		return enumGroup(gr).filter(checkRepaired);
-	var size = attackGroupSize();
+	let size = attackGroupSize();
 	if (size < groupSize(gr) / 2)
 		size = groupSize(gr) / 2;
-	var ret = naiveFindClusters(enumGroup(gr).filter(checkRepaired), (baseScale / 3));
+	const ret = naiveFindClusters(enumGroup(gr).filter(checkRepaired), (baseScale / 3));
 	if (ret.maxCount === 0)
 		return [];
-	for (var i = 0; i < ret.clusters.length; ++i)
+	for (let i = 0; i < ret.clusters.length; ++i)
 		if (i !== ret.maxIdx)
-			for (var j = 0; j < ret.clusters[i].length; ++j)
+			for (let j = 0; j < ret.clusters[i].length; ++j)
 				orderDroidLoc(ret.clusters[i][j], DORDER_MOVE, ret.xav[ret.maxIdx], ret.yav[ret.maxIdx]);
 	if (ret.maxCount < size) {
-		for (var j = 0; j < ret.clusters[ret.maxIdx].length; ++j) {
+		for (let j = 0; j < ret.clusters[ret.maxIdx].length; ++j) {
 			if (groupInDanger(gr))
 				orderDroid(ret.clusters[ret.maxIdx][j], DORDER_RTB);
 			else
@@ -212,7 +212,7 @@ function checkRepaired(droid) {
 }
 
 function attackTarget(droid) {
-	var target = findTarget(droid.group);
+	const target = findTarget(droid.group);
 	if (droid.group !== miscGroup)
 		if (!defined(target) || !droidCanReach(droid, target.x, target.y)) {
 			groupDroid(droid);
@@ -250,8 +250,8 @@ function pickVtolTarget(droid) {
 		function canHit(obj) {
 			return vtolCanHit(droid, obj);
 		}
-		var enemy = enumLivingPlayers().filter(isEnemy).random();
-		var list;
+		const enemy = enumLivingPlayers().filter(isEnemy).random();
+		let list;
 		list = enumStructList(miscTargets, enemy).filter(canHit);
 		if (list.length > 0) return list.random();
 		list = enumStruct(enemy, DEFENSE).filterProperty("canHitAir", true).filter(canHit);
@@ -292,14 +292,14 @@ _global.vtolArmed = function(obj, percent) {
 		return;
 	if (!isVTOL(obj))
 		return false;
-	for (var i = 0; i < obj.weapons.length; ++i)
+	for (let i = 0; i < obj.weapons.length; ++i)
 		if (obj.weapons[i].armed >= percent)
 			return true;
 	return false;
 }
 
 _global.attackGroupSize = function() {
-	var ret = personality.minTanks + (gameTime / 300000) * personality.becomeHarder;
+	let ret = personality.minTanks + (gameTime / 300000) * personality.becomeHarder;
 	if (ret > personality.maxTanks)
 		ret = personality.maxTanks;
 	return ret;
@@ -324,8 +324,8 @@ _global.setTarget = function(object, group) {
 }
 
 _global.unsetTarget = function(player) {
-	for (var i = 0; i <= MAX_GROUPS; ++i) {
-		var obj = safeGetObject(groupTargetLabel(i));
+	for (let i = 0; i <= MAX_GROUPS; ++i) {
+		const obj = safeGetObject(groupTargetLabel(i));
 		if (defined(obj) && obj.type === POSITION && findBeaconPlayer(obj.x, obj.y) === player)
 			removeLabel(groupTargetLabel(i));
 	}
@@ -342,7 +342,7 @@ _global.groupDroid = function(droid) {
 			groupAdd(miscGroup, droid);
 			return;
 		}
-		var grp = groupsBySize().filter(function(i) {
+		const grp = groupsBySize().filter(function(i) {
 			if (isAlly(i))
 				return false;
 			if (!defined(findTarget(i)))
@@ -351,7 +351,7 @@ _global.groupDroid = function(droid) {
 				return false;
 			return true;
 		});
-		var ret = grp.filter(function(i) {
+		let ret = grp.filter(function(i) {
 			return groupSize(i) < attackGroupSize() * 2 && defined(findTarget(i));
 		});
 		if (ret.length === 0)
@@ -368,17 +368,17 @@ _global.rebalanceGroups = function() {
 	if (throttled(5000))
 		return;
 	if (groupSize(miscGroup) > personality.maxMiscTanks) {
-		var list = enumGroup(miscGroup).shuffle();
-		for (var i = personality.maxMiscTanks; i < personality.maxMiscTanks + 5 && i < list.length; ++i)
+		const list = enumGroup(miscGroup).shuffle();
+		for (let i = personality.maxMiscTanks; i < personality.maxMiscTanks + 5 && i < list.length; ++i)
 			groupDroid(list[i]);
 	}
-	var ret = groupsBySize();
+	const ret = groupsBySize();
 	if (ret.length > 0)
 		if (ret[0] > 0 && ret[0] < attackGroupSize())
-			for (var i = 1; i < ret.length; ++i) {
-				var list = enumGroup(ret[i]);
-				for (var j = 0; j < list.length; ++j) {
-					var target = findTarget(ret[0]);
+			for (let i = 1; i < ret.length; ++i) {
+				const list = enumGroup(ret[i]);
+				for (let j = 0; j < list.length; ++j) {
+					const target = findTarget(ret[0]);
 					if (defined(target))
 						if (droidCanReach(list[j], target.x, target.y)) {
 							groupAdd(ret[0], list[j]);
@@ -398,8 +398,8 @@ _global.fallBack = function(droid, threat) {
 		return;
 	if (guessDroidMicro(droid) === MICRO.MELEE)
 		return;
-	var x = droid.x - (baseScale / 7) * (threat.x - droid.x) / distance(threat, droid);
-	var y = droid.y - (baseScale / 7) * (threat.y - droid.y) / distance(threat, droid);
+	const x = droid.x - (baseScale / 7) * (threat.x - droid.x) / distance(threat, droid);
+	const y = droid.y - (baseScale / 7) * (threat.y - droid.y) / distance(threat, droid);
 	if (x < 1 || y < 1 || x > mapWidth - 2 || y > mapHeight - 2)
 		return;
 	orderDroidLoc(droid, DORDER_MOVE, x, y);
@@ -412,7 +412,7 @@ _global.dangerLevel = function(loc) {
 _global.checkAttack = function() {
 	if (enumLivingPlayers().filter(isEnemy).length === 0)
 		return;
-	for (var i = 0; i < MAX_GROUPS; ++i)
+	for (let i = 0; i < MAX_GROUPS; ++i)
 		if (!throttled(3000, i)) {
 			regroup(i).forEach(attackTarget);
 			break;
@@ -422,21 +422,21 @@ _global.checkAttack = function() {
 	enumGroup(miscGroup).filter(checkRepaired).forEach(attackTarget);
 	if (throttled(5000, "vtols"))
 		return;
-	var droids = enumGroup(vtolGroup).filter(vtolReady);
+	const droids = enumGroup(vtolGroup).filter(vtolReady);
 	if (droids.length > attackGroupSize() / 3.)
 		droids.forEach(function(droid) {
-			var target = pickVtolTarget(droid);
+			const target = pickVtolTarget(droid);
 			if (defined(target))
 				orderDroidObj(droid, DORDER_ATTACK, target);
 		});
 }
 
 _global.pushVtols = function(object) {
-	var vtols = enumRange(object.x, object.y, 20, me, false);
-	var enemies = enumRange(object.x, object.y, 8, ENEMIES, true);
-	for (var i = 0; i < vtols.length; ++i)
+	const vtols = enumRange(object.x, object.y, 20, me, false);
+	const enemies = enumRange(object.x, object.y, 8, ENEMIES, true);
+	for (let i = 0; i < vtols.length; ++i)
 		if (vtolArmed(vtols[i], 1))
-			for (var j = 0; j < enemies.length; ++j)
+			for (let j = 0; j < enemies.length; ++j)
 				if (vtolCanHit(vtols[i], enemies[j])) {
 					orderDroidObj(vtols[i], DORDER_ATTACK, enemies[j]);
 					break;
@@ -445,8 +445,8 @@ _global.pushVtols = function(object) {
 
 _global.inPanic = function() {
 	function uncached() {
-		var badGuys = enumRange(baseLocation.x, baseLocation.y, baseScale, ENEMIES).length;
-		var goodGuys = enumRange(baseLocation.x, baseLocation.y, baseScale, ALLIES).filter(function(object) {
+		const badGuys = enumRange(baseLocation.x, baseLocation.y, baseScale, ENEMIES).length;
+		const goodGuys = enumRange(baseLocation.x, baseLocation.y, baseScale, ALLIES).filter(function(object) {
 			return object.type === DROID && (object.droidType === DROID_WEAPON || object.droidType === DROID_CYBORG);
 		}).length;
 		return 3 * badGuys > 2 * goodGuys;

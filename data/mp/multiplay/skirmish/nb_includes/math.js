@@ -21,7 +21,7 @@ _global.withChance = function distance(chancePercent) {
 //		distance(x,y, obj)
 //		distance(obj,x,y)
 _global.distance = function distance(obj1, obj2, obj3, obj4) {
-	var x1, x2, y1, y2;
+	let x1, x2, y1, y2;
 	if (defined(obj1.x)) {
 		x1 = obj1.x;
 		y1 = obj1.y;
@@ -84,28 +84,28 @@ Array.prototype.shuffle = function() {
 }
 
 _global.zeroArray = function(l) {
-	var ret = [];
-	for (var i = 0; i < l; ++i)
+	const ret = [];
+	for (let i = 0; i < l; ++i)
 		ret[i] = 0;
 	return ret;
 }
 
 _global.randomUnitArray = function(l) {
-	var ret = zeroArray(l);
+	const ret = zeroArray(l);
 	ret[random(l)] = 1;
 	return ret;
 }
 
 Array.prototype.addArray = function(arr) {
-	for (var i = 0; i < this.length; ++i)
+	for (let i = 0; i < this.length; ++i)
 		this[i] += arr[i];
 }
 
 // returns a random property of an object
 _global.randomItem = function(obj) {
-    var ret;
-    var count = 0;
-    for (var i in obj)
+    let ret;
+    let count = 0;
+    for (const i in obj)
         if (Math.random() < 1/++count)
            ret = i;
     return obj[ret];
@@ -113,13 +113,13 @@ _global.randomItem = function(obj) {
 
 // cluster analysis happens here
 _global.naiveFindClusters = function(list, size) {
-	var ret = { clusters: [], xav: [], yav: [], maxIdx: 0, maxCount: 0 };
-	for (var i = list.length - 1; i >= 0; --i) {
-		var x = list[i].x, y = list[i].y;
-		var found = false;
-		for (var j = 0; j < ret.clusters.length; ++j) {
+	const ret = { clusters: [], xav: [], yav: [], maxIdx: 0, maxCount: 0 };
+	for (let i = list.length - 1; i >= 0; --i) {
+		const x = list[i].x, y = list[i].y;
+		let found = false;
+		for (let j = 0; j < ret.clusters.length; ++j) {
 			if (distance(ret.xav[j], ret.yav[j], x, y) < size) {
-				var n = ret.clusters[j].length;
+				const n = ret.clusters[j].length;
 				ret.clusters[j][n] = list[i];
 				ret.xav[j] = (n * ret.xav[j] + x) / (n + 1);
 				ret.yav[j] = (n * ret.yav[j] + y) / (n + 1);
@@ -132,7 +132,7 @@ _global.naiveFindClusters = function(list, size) {
 			}
 		}
 		if (!found) {
-			var n = ret.clusters.length;
+			const n = ret.clusters.length;
 			ret.clusters[n] = [list[i]];
 			ret.xav[n] = x;
 			ret.yav[n] = y;

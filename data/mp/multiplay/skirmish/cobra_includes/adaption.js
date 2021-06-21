@@ -2,7 +2,7 @@
 //for anti-cyborg measures.
 function switchOffMG()
 {
-	var cyborgThreat = playerCyborgRatio(getMostHarmfulPlayer()) >= subPersonalities[personality].cyborgThreatPercentage;
+	const cyborgThreat = playerCyborgRatio(getMostHarmfulPlayer()) >= subPersonalities[personality].cyborgThreatPercentage;
 	// Will keep using machineguns until the basic laser is available or if the personality
 	// doesn't have the first of its primary weapon or artillery line available.
 	if ((cyborgThreat || !havePrimaryOrArtilleryWeapon()) && !componentAvailable("Laser3BEAMMk1"))
@@ -44,15 +44,15 @@ function countEnemyVTOL(player)
 {
 	function uncached(player)
 	{
-		var enemies = isDefined(player) ? [player] : findLivingEnemies();
-		var enemyVtolCount = 0;
+		const enemies = isDefined(player) ? [player] : findLivingEnemies();
+		let enemyVtolCount = 0;
 
-		for (var x = 0, e = enemies.length; x < e; ++x)
+		for (let x = 0, e = enemies.length; x < e; ++x)
 		{
-			var playerDroids = enumDroid(enemies[x]);
-			for (var c = 0, l = playerDroids.length; c < l; ++c)
+			const playerDroids = enumDroid(enemies[x]);
+			for (let c = 0, l = playerDroids.length; c < l; ++c)
 			{
-				var prop = playerDroids[c].propulsion;
+				const prop = playerDroids[c].propulsion;
 				if (prop === "V-Tol" || prop === "Helicopter")
 				{
 					++enemyVtolCount;
@@ -125,9 +125,9 @@ function adaptToMap()
 {
 	const HIGH_TECH_LEVEL = getMultiTechLevel() >= 2;
 	const FRIEND_COUNT = playerAlliance(true).length;
-	var highOil = highOilMap();
-	var personal;
-	var chosen;
+	const highOil = highOilMap();
+	let personal;
+	let chosen;
 
 	//Map to allow a higher chance for a specific personality to be chosen.
 	if (HIGH_TECH_LEVEL || highOil)

@@ -5,7 +5,7 @@
  */
 
 const gateways = enumGateways();
-var baseLocation = startPositions[me];
+const baseLocation = startPositions[me];
 
 function distanceToBase(loc) {
 	return distance(loc, baseLocation);
@@ -34,8 +34,8 @@ function isEnemy(player) {
 
 function enumLivingPlayers() {
 	function uncached() {
-		var ret = [];
-		for (var i = 0; i < maxPlayers; ++i) {
+		const ret = [];
+		for (let i = 0; i < maxPlayers; ++i) {
 			if (countStructList(targets, i) > 0) {
 				ret.push(i);
 				continue;

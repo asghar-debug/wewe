@@ -4,8 +4,8 @@
 const maxDroids = 25;		// max guys to handle.
 
 // scav group
-var attackGroup;
-var lastAttack = 0;
+let attackGroup;
+let lastAttack = 0;
 
 function produceDroid(fac1) {
 	if (fac1 && structureIdle(fac1) && groupSize(attackGroup) < maxDroids)
@@ -20,14 +20,14 @@ function produceDroid(fac1) {
 		case 4: buildDroid(fac1, "Firebus", "FireBody", "BaBaProp", null, null, "BabaFlame"); break;
 		default: buildDroid(fac1, "Bloke", "B1BaBaPerson01", "BaBaLegs", null, null, "BaBaMG"); break;
 		}
-	}	
+	}
 }
 
 // Regularly check back on our scavs
 function scavtick()
 {
 	// enum functions now return a list of results
-	var factorylist = enumStruct(me, "A0BaBaFactory");
+	const factorylist = enumStruct(me, "A0BaBaFactory");
 
 	// one way of dealing with lists is running a function on each member of the list
 	if (factorylist)
@@ -40,24 +40,24 @@ function scavtick()
 		lastAttack = gameTime;
 
 		// Return to nearest factory (ie base)
-		var droidlist = enumGroup(attackGroup);
+		const droidlist = enumGroup(attackGroup);
 
 		if (droidlist && factorylist)
 		{
 			// another way of dealing with lists is to iterate over them
 			// note, you must NOT use the for (... in ...) construct to iterate over an array of objects with properties!
-			for (var i = 0; i < droidlist.length; i++)
+			for (let i = 0; i < droidlist.length; i++)
 			{
-				var droid = droidlist[i];
-				var current = 0;
-				var closest = 9999;
-				var clfac;		// starts undefined
+				const droid = droidlist[i];
+				let current = 0;
+				let closest = 9999;
+				let clfac;		// starts undefined
 
 				// Find closest factory; notice that we still have the factory list from earlier, which
 				// saves us a few expensive scripting calls
-				for (var j = 0; j < factorylist.length; j++)
+				for (let j = 0; j < factorylist.length; j++)
 				{
-					var fact = factorylist[j];
+					const fact = factorylist[j];
 					current = distBetweenTwoPoints(fact.x, fact.y, droid.x, droid.y);
 					if (current < closest)
 					{
@@ -103,10 +103,10 @@ function eventAttacked(victim, attacker)
 	if (victim.type == STRUCTURE && (gameTime - lastAttack) > 3000)
 	{
 		lastAttack = gameTime;
-		var droidlist = enumGroup(attackGroup);
-		for (var i = 0; i < droidlist.length; i++)
+		const droidlist = enumGroup(attackGroup);
+		for (let i = 0; i < droidlist.length; i++)
 		{
-			var droid = droidlist[i];
+			const droid = droidlist[i];
 			if (distBetweenTwoPoints(victim.x, victim.y, attacker.x, attacker.y) < 24)
 			{
 				orderDroidLoc(droid, DORDER_SCOUT, attacker.x, attacker.y);
