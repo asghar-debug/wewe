@@ -50,6 +50,11 @@
 #include "radar.h"
 #include "seqdisp.h"
 
+#include "uiscreens/common.h"
+#include "uiscreens/options/graphicsoptions.h"
+#include "uiscreens/options/videooptions.h"
+#include "uiscreens/options/mouseoptions.h"
+
 bool hostQuitConfirmation = true;
 
 bool	InGameOpUp		= false;

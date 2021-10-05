@@ -42,6 +42,15 @@
 #include "../warzoneconfig.h"
 #include "../frend.h"
 
+#include "../uiscreens/titlemenu.h"
+#include "../uiscreens/options/optionsmenu.h"
+#include "../uiscreens/options/graphicsoptions.h"
+#include "../uiscreens/options/videooptions.h"
+#include "../uiscreens/options/mouseoptions.h"
+#include "../uiscreens/options/videooptions.h"
+#include "../uiscreens/options/autiozoomoptions.h"
+#include "../uiscreens/options/gameoptions.h"
+
 WzOldTitleUI::WzOldTitleUI(tMode mode) : mode(mode)
 {
 
