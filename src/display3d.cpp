@@ -105,6 +105,7 @@ static void	drawTiles(iView *player);
 static void	display3DProjectiles(const glm::mat4 &viewMatrix);
 static void	drawDroidSelections();
 static void	drawStructureSelections();
+static void drawStructureSelectedBox(STRUCTURE *psStructure, const glm::mat4 &modelViewMatrix);
 static void displayBlueprints(const glm::mat4 &viewMatrix);
 static void	processSensorTarget();
 static void	processDestinationTarget();
@@ -2479,6 +2480,7 @@ void renderStructure(STRUCTURE *psStructure, const glm::mat4 &viewMatrix)
 				pieFlag = pie_FORCE_FOG | ecmFlag;
 				pieFlagData = 255;
 			}
+
 			pie_Draw3DShape(getFactionIMD(faction, psStructure->pStructureType->pBaseIMD), 0, colour, buildingBrightness, pieFlag | pie_TRANSLUCENT, pieFlagData,
 				viewMatrix * modelMatrix);
 		}
@@ -2544,6 +2546,11 @@ void renderStructure(STRUCTURE *psStructure, const glm::mat4 &viewMatrix)
 		strImd = strImd->next;
 	}
 	setScreenDisp(&psStructure->sDisplay, viewModelMatrix);
+
+	if (psStructure->selected)
+	{
+	  drawStructureSelectedBox(psStructure, viewModelMatrix);
+	}
 }
 
 /// draw the delivery points
@@ -2809,6 +2816,37 @@ static void drawStructureTargetOriginIcon(STRUCTURE *psStruct, int weapon_slot)
 	default:
 		debug(LOG_WARNING, "Unexpected target origin in structure(%d)!", psStruct->id);
 	}
+}
+
+static void drawStructureSelectedBox(STRUCTURE *psStruct, const glm::mat4 &modelViewMatrix)
+{
+	Vector2i a(0,0);
+	Vector2i b(0,0);
+	Vector2i c(0,0);
+	Vector2i d(0,0);
+
+	int scaleFactor = 70;
+	int boxHeight = 0;
+
+	int width = psStruct->pStructureType->baseWidth * scaleFactor;
+	int height = psStruct->pStructureType->baseBreadth * scaleFactor;
+
+	Vector3i a_s(-width,boxHeight, -height);
+	Vector3i b_s(width, boxHeight, -height);
+	Vector3i c_s(width, boxHeight,  height);
+	Vector3i d_s(-width,boxHeight,  height);
+
+	pie_RotateProject(&a_s, modelViewMatrix, &a);
+	pie_RotateProject(&b_s, modelViewMatrix, &b);
+	pie_RotateProject(&c_s, modelViewMatrix, &c);
+	pie_RotateProject(&d_s, modelViewMatrix, &d);
+
+	debug(LOG_WZ, "drawStructureSelectedBox: min(%d, %d)  max(%d, %d)", a.x, a.y, b.x, b.y);
+	std::vector<PIERECT_DrawRequest> rectsToDraw;
+	iV_Line(a.x, a.y, (a.x + b.x)/3, (a.y + b.y)/3, WZCOL_WHITE);
+	iV_Line(b.x, b.y, c.x, c.y, WZCOL_WHITE);
+	iV_Line(c.x, c.y, d.x, d.y, WZCOL_WHITE);
+	iV_Line(d.x, d.y, a.x, a.y, WZCOL_WHITE);
 }
 
 /// draw the health bar for the specified structure
