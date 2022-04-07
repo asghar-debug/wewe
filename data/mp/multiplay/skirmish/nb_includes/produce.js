@@ -41,12 +41,12 @@ function chooseBodyWeaponPair(bodies, weapons) {
 		return undefined;
 	if (!defined(weapons))
 		return undefined;
-	for (var i = 0; i < weapons.length; ++i) {
-		var w = weapons[i].stat, ww = weapons[i].weight;
+	for (const weapon of weapons) {
+		var w = weapon.stat, ww = weapon.weight;
 		if (!componentAvailable(w))
 			continue;
-		for (var j = 0; j < bodies.length; ++j) {
-			var b = bodies[j].stat, bw = bodies[j].weight;
+		for (const body of bodies) {
+			var b = body.stat, bw = body.weight;
 			if (!componentAvailable(b))
 				continue;
 			/* eslint-disable no-unreachable */
@@ -121,7 +121,7 @@ function produceVtol(factory) {
 
 function produceTemplateFromList(factory, list) {
 	var ret = scopeRatings();
-	for (var i = list.length - 1; i >= 0; --i) {
+	for (let i = list.length - 1; i >= 0; --i) {
 		if (ret.land === 0 && !isHoverPropulsion(list[i].prop) && !isVtolPropulsion(list[i].prop))
 			continue;
 		if (ret.land === 0 && ret.sea === 0 && !isVtolPropulsion(list[i].prop))

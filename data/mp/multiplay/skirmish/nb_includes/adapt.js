@@ -17,16 +17,16 @@ function adaptVote(our, their, verbose) {
 	if (theirTotal === 0)
 		return verbose ? randomUnitArray(l) : random(l);
 	var rating = [];
-	for (var i = 0; i < l; ++i)
+	for (let i = 0; i < l; ++i)
 		rating[i] = their[i] / theirTotal;
 	if (ourTotal > 0)
-		for (var i = 0; i < l; ++i)
+		for (let i = 0; i < l; ++i)
 			rating[i] -= our[i] / ourTotal;
 	if (verbose)
 		return rating.map((val) => ((val + 1) / 2));
 	var maxRating = -Infinity;
 	var maxIdx = 0;
-	for (var i = 0; i < l; ++i)
+	for (let i = 0; i < l; ++i)
 		if (rating[i] > maxRating) {
 			maxRating = rating[i];
 			maxIdx = i;
@@ -56,7 +56,7 @@ function addStat(to, what, weight) {
 		weight = 1;
 	for (const prop in to) {
 		if (to[prop].constructor === Array)
-			for (var i = 0; i < to[prop].length; ++i)
+			for (const i of to[prop].keys())
 				to[prop][i] += what[prop][i] * weight;
 		else
 			to[prop] += what[prop] * weight;
@@ -110,7 +110,7 @@ function MyStat() {
 }
 
 var enemyStats = [], enemyStatsTemp = [];
-for (var i = 0; i < maxPlayers; ++i) {
+for (let i = 0; i < maxPlayers; ++i) {
 	enemyStats[i] = new EnemyStat();
 	enemyStatsTemp[i] = new EnemyStat();
 }
@@ -189,8 +189,8 @@ function classifyObject(obj) {
 		return ret;
 	if (obj.type === FEATURE)
 		return ret;
-	for (var i = 0; i < obj.weapons.length; ++i) {
-		var roles = guessWeaponRole(obj.weapons[i].name); {
+	for (const weapon of obj.weapons) {
+		var roles = guessWeaponRole(weapon.name); {
 			if (!defined(roles)) {
 				if (obj.canHitAir && obj.canHitGround)
 					ret.role.addArray([1/4, 1/4, 1/4, 1/4]);
@@ -202,8 +202,8 @@ function classifyObject(obj) {
 				ret.role.addArray(roles);
 		}
 	}
-	for (var i = 0; i < obj.weapons.length; ++i) {
-		if (getWeaponInfo(obj.weapons[i].name).impactClass === "KINETIC")
+	for (const weapon of obj.weapons) {
+		if (getWeaponInfo(weapon.name).impactClass === "KINETIC")
 			ret.kweapon += 1;
 		else
 			ret.tweapon += 1;
@@ -292,7 +292,7 @@ _global.adaptCycle = function() {
 		var items = MAX_PER_CYCLE;
 		if (items > stack.length)
 			items = stack.length;
-		for (var i = 0; i < items; ++i) {
+		for (let i = 0; i < items; ++i) {
 			var obj = stack.pop();
 			if (isEnemy(adaptCycle.player))
 				summUpEnemyObject(obj, enemyStatsTemp[adaptCycle.player]);

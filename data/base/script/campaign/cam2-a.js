@@ -24,20 +24,17 @@ function preDamageStuff()
 {
 	var droids = enumDroid(CAM_HUMAN_PLAYER);
 	var structures = enumStruct(CAM_HUMAN_PLAYER);
-	var x = 0;
 
-	for (x = 0; x < droids.length; ++x)
+	for (const droid of droids)
 	{
-		var droid = droids[x];
 		if (!camIsTransporter(droid))
 		{
 			setHealth(droid, 45 + camRand(20));
 		}
 	}
 
-	for (x = 0; x < structures.length; ++x)
+	for (const struc of structures)
 	{
-		var struc = structures[x];
 		setHealth(struc, 45 + camRand(45));
 	}
 }
@@ -60,7 +57,7 @@ function getDroidsForCOLZ()
 		usingHeavy = true;
 	}
 
-	for (var i = 0; i < count; ++i)
+	for (let i = 0; i < count; ++i)
 	{
 		if (!i && usingHeavy)
 		{
@@ -115,7 +112,7 @@ function sendPlayerTransporter()
 	var droids = [];
 	var list = [cTempl.prhct, cTempl.prhct, cTempl.prhct, cTempl.prltat, cTempl.prltat, cTempl.npcybr, cTempl.prrept];
 
-	for (var i = 0; i < 10; ++i)
+	for (let i = 0; i < 10; ++i)
 	{
 		droids.push(list[camRand(list.length)]);
 	}
@@ -135,7 +132,7 @@ function mapEdgeDroids()
 	var list = [cTempl.npcybm, cTempl.npcybr, cTempl.commrp, cTempl.cohct];
 
 	var droids = [];
-	for (var i = 0; i < TankNum; ++i)
+	for (let i = 0; i < TankNum; ++i)
 	{
 		droids.push(list[camRand(list.length)]);
 	}
@@ -200,9 +197,9 @@ function cam2Setup()
 		"R-Wpn-RocketSlow-Damage04", "R-Sys-Sensor-Upgrade01"
 	];
 
-	for (var x = 0, l = STRUCTS_ALPHA.length; x < l; ++x)
+	for (const structAlpha of STRUCTS_ALPHA)
 	{
-		enableStructure(STRUCTS_ALPHA[x], CAM_HUMAN_PLAYER);
+		enableStructure(structAlpha, CAM_HUMAN_PLAYER);
 	}
 
 	camCompleteRequiredResearch(PLAYER_RES_BETA, CAM_HUMAN_PLAYER);
@@ -233,9 +230,8 @@ function setUnitRank(transport)
 		droids = enumDroid(CAM_HUMAN_PLAYER).filter((dr) => (!camIsTransporter(dr)));
 	}
 
-	for (var i = 0, len = droids.length; i < len; ++i)
+	for (const droid of droids)
 	{
-		var droid = droids[i];
 		if (!camIsSystemDroid(droid))
 		{
 			setDroidExperience(droid, DROID_EXP[mapRun ? 0 : (transporterIndex - 1)]);

@@ -62,10 +62,10 @@ function isDerrick(obj)
 function setupTruckGroups()
 {
 	var cons = enumDroid(me, DROID_CONSTRUCT);
-	for (var i = 0, l = cons.length; i < l; ++i)
+	for (const i of cons.keys())
 	{
-		var droid = cons[i];
-		if (l < MIN_BASE_TRUCKS)
+		const droid = cons[i];
+		if (cons.length < MIN_BASE_TRUCKS)
 		{
 			if (countStruct(FACTORY_STAT) === 0)
 			{
@@ -78,7 +78,7 @@ function setupTruckGroups()
 		}
 		else
 		{
-			if (i < Math.floor(l / 2))
+			if (i < Math.floor(cons.length / 2))
 			{
 				groupAdd(baseBuilders, droid);
 			}

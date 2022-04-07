@@ -73,9 +73,9 @@ function sendTransport()
 	// Randomly find an LZ that is not compromised
 	if (camRand(100) < 10)
 	{
-		for (i = 0; i < landingZoneList.length; ++i)
+		for (const i of landingZoneList.keys())
 		{
-			var lz = landingZoneList[i];
+			const lz = landingZoneList[i]
 			if (enumArea(lz, CAM_HUMAN_PLAYER, false).length === 0)
 			{
 				list.push({ idx: i, label: lz });
@@ -153,7 +153,7 @@ function eventStartLevel()
 	setNoGoArea(lz.x, lz.y, lz.x2, lz.y2, CAM_HUMAN_PLAYER);
 
 	// make sure player doesn't build on enemy LZs
-	for (var i = 1; i <= 5; ++i)
+	for (let i = 1; i <= 5; ++i)
 	{
 		var ph = getObject("PhantomLZ" + i);
 		// HACK: set LZs of bad players, namely 2...6,

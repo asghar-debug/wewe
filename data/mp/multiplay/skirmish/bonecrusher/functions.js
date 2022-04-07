@@ -42,7 +42,7 @@ function getInfoNear(x,y,command,range,time,obj,cheat,inc){
 
 		if(command == 'safe'){
 			var danger = [];
-			for ( var e = 0; e < maxPlayers; ++e ) {
+			for (let e = 0; e < maxPlayers; ++e) {
 				if ( allianceExistsBetween(me,e) ) continue;
 				danger = danger.concat(enumDroid(e, DROID_WEAPON, view));
 				danger = danger.concat(enumDroid(e, DROID_CYBORG, view));
@@ -54,8 +54,8 @@ function getInfoNear(x,y,command,range,time,obj,cheat,inc){
 				danger = danger.concat(enumStruct(scavengerPlayer, DEFENSE, view));
 			}
 
-			for (const d in danger) {
-				if ( distBetweenTwoPoints_p(x,y,danger[d].x,danger[d].y) < range ) {
+			for (const d of danger) {
+				if ( distBetweenTwoPoints_p(x,y,d.x,d.y) < range ) {
 					_globalInfoNear[x+'_'+y+'_'+command].value = false;
 					return _globalInfoNear[x+'_'+y+'_'+command];
 				}
@@ -65,8 +65,8 @@ function getInfoNear(x,y,command,range,time,obj,cheat,inc){
 		}else if(command == 'defended'){
 
 			var defenses = enumStruct(me, DEFENSE).filter((e) => (e.status == BUILT));
-			for (const d in defenses) {
-				if ( distBetweenTwoPoints_p(x,y,defenses[d].x,defenses[d].y) < range ) {
+			for (const defense of defenses) {
+				if ( distBetweenTwoPoints_p(x,y,defense.x,defense.y) < range ) {
 					_globalInfoNear[x+'_'+y+'_'+command].value = true;
 					return _globalInfoNear[x+'_'+y+'_'+command];
 				}
@@ -262,10 +262,10 @@ function isBeingRepaired(who){
 //			debugMsg("Нас атакует вражесая башня ["+who.player+"]",5);
 			var droids = enumDroid(who.player,DROID_CONSTRUCT,me);
 			if ( droids.length > 0 ) {
-				for (const i in droids) {
-					if ( distBetweenTwoPoints_p(who.x,who.y,droids[i].x,droids[i].y) <= 3 ) {
+				for (const droid of droids) {
+					if ( distBetweenTwoPoints_p(who.x,who.y,droid.x,droid.y) <= 3 ) {
 //						debugMsg("Атакующая меня башня подвергается ремонту!",5);
-						return droids[i];
+						return droid;
 					}
 				}
 			}
@@ -300,13 +300,13 @@ function sortByDistance(arr, obj, num, reach){
 
 		var b = Infinity;
 		var c = [];
-		for (const i in arr) {
-			if(reach)if(!droidCanReach_p(obj, arr[i].x, arr[i].y))continue;
-//			if(reach)if(!droidCanReach_p(arr[i], obj.x, obj.y))continue;
-			var a = distBetweenTwoPoints_p( obj.x, obj.y, arr[i].x, arr[i].y );
+		for (const item of arr) {
+			if(reach)if(!droidCanReach_p(obj, item.x, item.y))continue;
+//			if(reach)if(!droidCanReach_p(item, obj.x, obj.y))continue;
+			var a = distBetweenTwoPoints_p( obj.x, obj.y, item.x, item.y );
 			if ( a < b ) {
 				b = a;
-				c[0] = arr[i];
+				c[0] = item;
 			}
 		}
 		return c;
@@ -346,34 +346,34 @@ function checkProcess(){
 		gameStop("loose");
 	}
 
-	for (const plally in bc_ally) {
-		if(bc_ally[plally] == me) continue;
+	for (const playerAlly of bc_ally) {
+		if(playerAlly == me) continue;
 
 		if(getInfoNear(base.x,base.y,'safe',base_range).value){
 
-			if(playerPower(bc_ally[plally]) < 100 && playerPower(me) > 100){
+			if(playerPower(playerAlly) < 100 && playerPower(me) > 100){
 				var _pow = Math.floor(playerPower(me)/2);
-				debugMsg("Send "+_pow+" power to "+bc_ally[plally], 'ally');
-				donatePower(_pow, bc_ally[plally]);
+				debugMsg("Send "+_pow+" power to "+playerAlly, 'ally');
+				donatePower(_pow, playerAlly);
 			}
 
-			if(enumDroid(bc_ally[plally], DROID_CONSTRUCT).length < 3){
+			if(enumDroid(playerAlly, DROID_CONSTRUCT).length < 3){
 				if(groupSize(buildersMain) >= 2){
 					var truck = enumGroup(buildersMain);
 					if(truck.length > 0){
-						debugMsg("Send builder["+truck[0].id+"] from "+me+" to "+bc_ally[plally], 'ally');
-						donateObject(truck[0], bc_ally[plally]);
+						debugMsg("Send builder["+truck[0].id+"] from "+me+" to "+playerAlly, 'ally');
+						donateObject(truck[0], playerAlly);
 						break;
-					} else { debugMsg("No more builders from "+me+" to "+bc_ally[plally], 'ally');}
+					} else { debugMsg("No more builders from "+me+" to "+playerAlly, 'ally');}
 				}
 
 				if(groupSize(buildersHunters) > 1){
 					var truck = enumGroup(buildersHunters);
 					if(truck.length > 0){
-						donateObject(truck[0], bc_ally[plally]);
-						debugMsg("Send hunter["+truck[0].id+"] from "+me+" to "+bc_ally[plally], 'ally');
+						donateObject(truck[0], playerAlly);
+						debugMsg("Send hunter["+truck[0].id+"] from "+me+" to "+playerAlly, 'ally');
 						break;
-					} else { debugMsg("No more hunters from "+me+" to "+bc_ally[plally], 'ally');}
+					} else { debugMsg("No more hunters from "+me+" to "+playerAlly, 'ally');}
 				}
 			}
 		}
@@ -443,7 +443,7 @@ function playerSpectator(player){
 //функция отфильтровывает объекты, которые находяться близко
 //к "живым" союзникам, полезно для отказа от захвата ресурсов союзника
 function filterNearAlly(obj){
-	for ( var p = 0; p < maxPlayers; ++p ){
+	for (let p = 0; p < maxPlayers; ++p) {
 		if ( p == me ) continue; //Выкидываем себя
 		if ( !allianceExistsBetween(me,p) ) continue; //Выкидываем вражеские
 //		if ( playerLoose(p) ) continue; //Пропускаем проигравших
@@ -485,7 +485,7 @@ function getEnemyNearAlly(){
 //	return []; // <-- disable this funtion
 	var targ = [];
 	var enemy = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumDroid(e, DROID_WEAPON, me));
 	}
@@ -493,7 +493,7 @@ function getEnemyNearAlly(){
 		targ = targ.concat(enumDroid(scavengerPlayer, DROID_WEAPON, me));
 	}
 
-	for ( var p = 0; p < maxPlayers; ++p ) {
+	for (let p = 0; p < maxPlayers; ++p) {
 		if ( p == me ) continue;
 		if ( !allianceExistsBetween(me,p) ) continue;
 //		if ( playerLoose(p) ) continue; //Пропускаем проигравших
@@ -514,7 +514,7 @@ function getEnemyNearPos(x,y,r){
 	if(typeof r === "undefined") r = 7;
 	var targ = [];
 	var enemy = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		if ( playerSpectator(e) ) continue;
 		if ( e == me ) continue;
@@ -533,7 +533,7 @@ function getEnemyNearPos(x,y,r){
 function getAllyArmy(){
 	var army = [];
 
-	for ( var p = 0; p < maxPlayers; ++p ) {
+	for (let p = 0; p < maxPlayers; ++p) {
 		if ( p == me ) continue;
 		if ( !allianceExistsBetween(me,p) ) continue;
 		if ( playerSpectator(p) ) continue;
@@ -553,7 +553,7 @@ function getFreeResources(){
 //Функция возвращает все свободные и занятые нефтеточки на карте.
 function getAllResources(){
 	var resources = getFreeResources();
-	for ( var e = 0; e < maxPlayers; ++e ) resources = resources.concat(enumStruct(e,RESOURCE_EXTRACTOR));
+	for (let e = 0; e < maxPlayers; ++e) resources = resources.concat(enumStruct(e,RESOURCE_EXTRACTOR));
 	if(scavengers != NO_SCAVENGERS){
 		resources = resources.concat(enumStruct(scavengerPlayer, "A0ResourceExtractor"));
 	}
@@ -569,8 +569,8 @@ function getUnknownResources(){
 	var iSee = getSeeResources();
 	if ( iSee.length === 0 ) return allResources;
 	var notSee = allResources.filter((value) => {
-		for (const i in iSee) {
-			if ( value.x == iSee[i].x && value.y == iSee[i].y ) return false;
+		for (const seeRes of iSee) {
+			if ( value.x == seeRes.x && value.y == seeRes.y ) return false;
 		}
 		return true;
 	});
@@ -582,7 +582,7 @@ function getUnknownResources(){
 function getSeeResources(){
 	var iSee = [];
 	iSee = iSee.concat(enumFeature(me, "OilResource"));
-	for ( var e = 0; e < maxPlayers; ++e ){
+	for (let e = 0; e < maxPlayers; ++e) {
 //		if ( !allianceExistsBetween(me,e) ) continue; //Выкидываем вражеские
 		iSee = iSee.concat(enumStruct(e, RESOURCE_EXTRACTOR, me));
 	}
@@ -593,7 +593,7 @@ function getSeeResources(){
 
 function getProblemBuildings(){
 	var targ=[];
-	for ( var p = 0; p < maxPlayers; ++p ){
+	for (let p = 0; p < maxPlayers; ++p) {
 		if ( !allianceExistsBetween(me,p) ) continue; //Выкидываем вражеские
 		if ( playerSpectator(p) ) continue; //Пропускаем неиграющих
 		targ = targ.concat(enumStruct(p).filter((e) => (e.status == BEING_BUILT || e.health < 99)));
@@ -603,7 +603,7 @@ function getProblemBuildings(){
 
 function getEnemyFactories(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumStruct(e, FACTORY, me));
 		targ = targ.concat(enumStruct(e, CYBORG_FACTORY, me));
@@ -617,7 +617,7 @@ function getEnemyFactories(){
 
 function getEnemyFactoriesVTOL(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumStruct(e, VTOL_FACTORY, me));
 	}
@@ -626,7 +626,7 @@ function getEnemyFactoriesVTOL(){
 
 function getEnemyPads(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumStruct(e, REARM_PAD, me));
 	}
@@ -636,7 +636,7 @@ function getEnemyPads(){
 
 function getEnemyNearBase(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumDroid(e, DROID_ANY, me));
 		targ = targ.concat(enumStruct(e, DEFENSE, me));
@@ -649,7 +649,7 @@ function getEnemyNearBase(){
 }
 function getEnemyCloseBase(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumDroid(e, DROID_ANY, me));
 	}
@@ -661,7 +661,7 @@ function getEnemyCloseBase(){
 
 function getOurDefences(){
 	var targ = [];
-	for (const a in ally) {
+	for (const a of ally.keys()) {
 		targ = targ.concat(enumStruct(a, DEFENSE).filter((e) => (e.status == 1)));
 	}
 	targ = targ.concat(enumStruct(me, DEFENSE).filter((e) => (e.status == 1)));
@@ -674,7 +674,7 @@ function getNearFreeResources(pos){
 
 function getNumEnemies(){
 	var enemies = 0;
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		if ( playerSpectator(e) ) continue;
 		if ( playerLoose(e) ) continue;
@@ -691,7 +691,7 @@ function isHumanOverride(){
 
 
 function isHumanAlly(){
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if(playerData[e].isHuman && allianceExistsBetween(me, e)) return true;
 	}
 	return false;
@@ -748,7 +748,7 @@ function mark(x,y){
 
 function getEnemyStartPos(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		if ( playerSpectator(e) ) continue;
 		if ( playerLoose(e) ) continue;
@@ -759,7 +759,7 @@ function getEnemyStartPos(){
 
 function getEnemyBuilders(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumDroid(e, DROID_CONSTRUCT, me));
 //		targ = targ.concat(enumDroid(e, 10, me)); // Киборг-строитель
@@ -770,7 +770,7 @@ function getEnemyBuilders(){
 
 function getEnemyWarriors(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumDroid(e, DROID_WEAPON, me));
 		targ = targ.concat(enumDroid(e, DROID_CYBORG, me));
@@ -780,7 +780,7 @@ function getEnemyWarriors(){
 
 function getEnemyDefences(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumStruct(e, DEFENSE, me));
 	}
@@ -793,7 +793,7 @@ function getEnemyDefences(){
 
 function getEnemyStructures(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( e == me ) continue;
 		if ( allianceExistsBetween(me,e) ) continue;
 		if ( playerSpectator(e) ) continue;
@@ -819,7 +819,7 @@ function getEnemyStructures(){
 
 function getEnemyWalls(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumStruct(e, WALL, me));
 	}
@@ -832,7 +832,7 @@ function getEnemyWalls(){
 //Функция возвращает все видимые вражеские ресурсы
 function getEnemyResources(){
 	var enemyRigs = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		var tmp = enumStruct(e, RESOURCE_EXTRACTOR, me);
 		enemyRigs = enemyRigs.concat(tmp);
@@ -845,7 +845,7 @@ function getEnemyResources(){
 //Возвращает строителей, инженеров, заводы и киборг-заводы
 function getEnemyProduction(){
 	var targ = [];
-	for ( var e = 0; e < maxPlayers; ++e ) {
+	for (let e = 0; e < maxPlayers; ++e) {
 		if ( allianceExistsBetween(me,e) ) continue;
 		targ = targ.concat(enumStruct(e, RESOURCE_EXTRACTOR, me));
 		targ = targ.concat(enumDroid(e, DROID_CONSTRUCT, me));
@@ -868,11 +868,11 @@ function removeDuplicates(originalArray, objKey) {
 	var values = [];
 	var value;
 
-	for(var i = 0; i < originalArray.length; i++) {
-		value = originalArray[i][objKey];
+	for (const originalArrayItem of originalArray) {
+		value = originalArrayItem[objKey];
 
 		if(values.indexOf(value) === -1) {
-			trimmedArray.push(originalArray[i]);
+			trimmedArray.push(originalArrayItem);
 			values.push(value);
 		}
 	}
@@ -886,8 +886,8 @@ function inProduce(type){
 	if(produceTrigger.length === 0) return 0;
 	var _prod = 0;
 
-	for (const p in produceTrigger) {
-		if (produceTrigger[p] == type) _prod++;
+	for (const produceTri of produceTrigger) {
+		if (produceTri == type) _prod++;
 	}
 
 	return _prod;
@@ -915,37 +915,39 @@ function attackObjects(targets, warriors, num, scouting){
 
 	targets = targets.slice(0,num);
 
-	for (const i in targets) {
-		var target = isBeingRepaired(targets[i]);
+	for (const i of targets.keys()) {
+		const tar = targets[i];
+		var target = isBeingRepaired(tar);
 		if ( target != false) {
 			targets[i] = target;
 		}
 	}
 
 	if ( targets.length >= warriors.length ) {
-		for ( var i = 0, len = warriors.length; i<len; ++i ) {
-			if(scouting) orderDroidLoc_p(warriors[i], DORDER_SCOUT, targets[i].x, targets[i].y);
-			else orderDroidObj_p( warriors[i], DORDER_ATTACK, targets[i] );
+		for (const i of warriors.keys()) {
+			const warrior = warriors[i];
+			if(scouting) orderDroidLoc_p(warrior, DORDER_SCOUT, targets[i].x, targets[i].y);
+			else orderDroidObj_p( warrior, DORDER_ATTACK, targets[i] );
 		}
 		return true;
 	}else{
 		var a = Math.floor(warriors.length/targets.length);
 		var i=0;
 		var t=0;
-		for (const n in warriors) {
+		for (const warrior of warriors) {
 			t++;
 			if ( i == targets.length ) return true;
 			var busy = false;
-			for (const j in targets) {
-				if ( distBetweenTwoPoints_p ( targets[j].x,targets[j].y,warriors[n].x,warriors[n].y ) < 7 ) {
-					if(scouting) orderDroidLoc_p(warriors[n], DORDER_SCOUT, targets[j].x, targets[j].y);
-					else orderDroidObj_p( warriors[n], DORDER_ATTACK, targets[j] );
+			for (const target of targets) {
+				if ( distBetweenTwoPoints_p ( target.x,target.y,warrior.x,warrior.y ) < 7 ) {
+					if(scouting) orderDroidLoc_p(warrior, DORDER_SCOUT, target.x, target.y);
+					else orderDroidObj_p( warrior, DORDER_ATTACK, target );
 					busy = true;
 				}
 			}
 			if ( busy ) continue;
-			if(scouting) orderDroidLoc_p(warriors[n], DORDER_SCOUT, targets[i].x, targets[i].y);
-			else orderDroidObj_p( warriors[n], DORDER_ATTACK, targets[i] );
+			if(scouting) orderDroidLoc_p(warrior, DORDER_SCOUT, targets[i].x, targets[i].y);
+			else orderDroidObj_p( warrior, DORDER_ATTACK, targets[i] );
 			if ( t >= a ){
 //				debugMsg("getTarget: Атака на "+targets.length+" цели по "+a+" юнита ("+targets[i].x+","+targets[i].y+")",4);
 				t=0;
