@@ -143,13 +143,13 @@ bool triggerEventBeacon(int from, int to, const char *message, int x, int y);
 bool triggerEventBeaconRemoved(int from, int to);
 bool triggerEventPickup(FEATURE *psFeat, DROID *psDroid);
 bool triggerEventCheatMode(bool entered);
-bool triggerEventGroupLoss(const BASE_OBJECT *psObj, int group, int size, wzapi::scripting_instance *instance);
+bool triggerEventGroupLoss(const BASE_OBJECT *psObj, int groupId, int size, wzapi::scripting_instance *instance);
 bool triggerEventDroidMoved(DROID *psDroid, int oldx, int oldy);
 bool triggerEventArea(const std::string& label, DROID *psDroid);
 bool triggerEventSelected();
 bool triggerEventPlayerLeft(int player);
 bool triggerEventDesignCreated(DROID_TEMPLATE *psTemplate);
-bool triggerEventSyncRequest(int from, int req_id, int x, int y, BASE_OBJECT *psObj, BASE_OBJECT *psObj2);
+bool triggerEventSyncRequest(int from, int reqId, int x, int y, BASE_OBJECT *psObj1, BASE_OBJECT *psObj2);
 bool triggerEventKeyPressed(int meta, int key);
 bool triggerEventAllianceOffer(uint8_t from, uint8_t to);
 bool triggerEventAllianceAccepted(uint8_t from, uint8_t to);
@@ -384,9 +384,9 @@ public:
 	static wzapi::no_return_value resetLabel(WZAPI_PARAMS(std::string labelName, optional<int> playerFilter));
 	static std::vector<std::string> enumLabels(WZAPI_PARAMS(optional<int> filterLabelType));
 
-	static wzapi::no_return_value addLabel(WZAPI_PARAMS(generic_script_object object, std::string label, optional<int> _triggered));
+	static wzapi::no_return_value addLabel(WZAPI_PARAMS(generic_script_object object, std::string labelName, optional<int> _triggered));
 
-	static int removeLabel(WZAPI_PARAMS(std::string label));
+	static int removeLabel(WZAPI_PARAMS(std::string labelName));
 	static optional<std::string> getLabel(WZAPI_PARAMS(const BASE_OBJECT *psObj));
 	static optional<std::string> getLabelJS(WZAPI_PARAMS(wzapi::game_object_identifier obj_id));
 

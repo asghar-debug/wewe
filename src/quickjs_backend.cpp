@@ -294,33 +294,33 @@ public:
 public:
 	// MARK: Transporter events
 
-	//__ ## eventTransporterLaunch(transport)
+	//__ ## eventTransporterLaunch(transporterDroid)
 	//__
 	//__ An event that is run when the mission transporter has been ordered to fly off.
 	//__
 	virtual bool handle_eventLaunchTransporter() override; // DEPRECATED!
 	virtual bool handle_eventTransporterLaunch(const BASE_OBJECT *psTransport) override;
 
-	//__ ## eventTransporterArrived(transport)
+	//__ ## eventTransporterArrived(transporterDroid)
 	//__
 	//__ An event that is run when the mission transporter has arrived at the map edge with reinforcements.
 	//__
 	virtual bool handle_eventReinforcementsArrived() override; // DEPRECATED!
 	virtual bool handle_eventTransporterArrived(const BASE_OBJECT *psTransport) override;
 
-	//__ ## eventTransporterExit(transport)
+	//__ ## eventTransporterExit(transporterDroid)
 	//__
 	//__ An event that is run when the mission transporter has left the map.
 	//__
 	virtual bool handle_eventTransporterExit(const BASE_OBJECT *psObj) override;
 
-	//__ ## eventTransporterDone(transport)
+	//__ ## eventTransporterDone(transporterDroid)
 	//__
 	//__ An event that is run when the mission transporter has no more reinforcements to deliver.
 	//__
 	virtual bool handle_eventTransporterDone(const BASE_OBJECT *psTransport) override;
 
-	//__ ## eventTransporterLanded(transport)
+	//__ ## eventTransporterLanded(transporterDroid)
 	//__
 	//__ An event that is run when the mission transporter has landed with reinforcements.
 	//__
@@ -329,13 +329,13 @@ public:
 public:
 	// MARK: UI-related events (intended for the tutorial)
 
-	//__ ## eventDeliveryPointMoving()
+	//__ ## eventDeliveryPointMoving(structure)
 	//__
 	//__ An event that is run when the current player starts to move a delivery point.
 	//__
 	virtual bool handle_eventDeliveryPointMoving(const BASE_OBJECT *psStruct) override;
 
-	//__ ## eventDeliveryPointMoved()
+	//__ ## eventDeliveryPointMoved(structure)
 	//__
 	//__ An event that is run after the current player has moved a delivery point.
 	//__
@@ -410,22 +410,21 @@ public:
 	//__
 	virtual bool handle_eventMenuManufacture() override;
 
-	//__ ## eventSelectionChanged(objects)
+	//__ ## eventSelectionChanged(droidsAndStructures)
 	//__
 	//__ An event that is triggered whenever the host player selects one or more game objects.
-	//__ The ```objects``` parameter contains an array of the currently selected game objects.
+	//__ The `droidsAndStructures` parameter contains an array of the currently selected game objects.
 	//__ Keep in mind that the player may drag and drop select many units at once, select one
 	//__ unit specifically, or even add more selections to a current selection one at a time.
-	//__ This event will trigger once for each user action, not once for each selected or
-	//__ deselected object. If all selected game objects are deselected, ```objects``` will
-	//__ be empty.
+	//__ This event will trigger once for each user action, not once for each selected or deselected object.
+	//__ If all selected game objects are deselected, `droidsAndStructures` will be empty.
 	//__
-	virtual bool handle_eventSelectionChanged(const std::vector<const BASE_OBJECT *>& objects) override;
+	virtual bool handle_eventSelectionChanged(const std::vector<const BASE_OBJECT *>& droidsAndStructures) override;
 
 public:
 	// MARK: Game state-change events
 
-	//__ ## eventObjectRecycled()
+	//__ ## eventObjectRecycled(droidOrStructure)
 	//__
 	//__ An event that is run when an object (ex. droid, structure) is recycled.
 	//__
@@ -440,7 +439,7 @@ public:
 	//__ ## eventCheatMode(entered)
 	//__
 	//__ Game entered or left cheat/debug mode.
-	//__ The entered parameter is true if cheat mode entered, false otherwise.
+	//__ The `entered` parameter is `true` if cheat mode entered, `false` otherwise.
 	//__
 	virtual bool handle_eventCheatMode(bool entered) override;
 
@@ -452,32 +451,31 @@ public:
 
 	//__ ## eventDroidBuilt(droid[, structure])
 	//__
-	//__ An event that is run every time a droid is built. The structure parameter is set
+	//__ An event that is run every time a droid is built. The `structure` parameter is set
 	//__ if the droid was produced in a factory. It is not triggered for droid theft or
-	//__ gift (check ```eventObjectTransfer``` for that).
+	//__ gift (check `eventObjectTransfer()` for that).
 	//__
 	virtual bool handle_eventDroidBuilt(const DROID *psDroid, optional<const STRUCTURE *> psFactory) override;
 
 	//__ ## eventStructureBuilt(structure[, droid])
 	//__
-	//__ An event that is run every time a structure is produced. The droid parameter is set
+	//__ An event that is run every time a structure is produced. The `droid` parameter is set
 	//__ if the structure was built by a droid. It is not triggered for building theft
-	//__ (check ```eventObjectTransfer``` for that).
+	//__ (check `eventObjectTransfer()` for that).
 	//__
 	virtual bool handle_eventStructureBuilt(const STRUCTURE *psStruct, optional<const DROID *> psDroid) override;
 
 	//__ ## eventStructureDemolish(structure[, droid])
 	//__
-	//__ An event that is run every time a structure begins to be demolished. This does
-	//__ not trigger again if the structure is partially demolished.
+	//__ An event that is run every time a structure begins to be demolished.
+	//__ This does not trigger again if the structure is partially demolished.
 	//__
 	virtual bool handle_eventStructureDemolish(const STRUCTURE *psStruct, optional<const DROID *> psDroid) override;
 
 	//__ ## eventStructureReady(structure)
 	//__
-	//__ An event that is run every time a structure is ready to perform some
-	//__ special ability. It will only fire once, so if the time is not right,
-	//__ register your own timer to keep checking.
+	//__ An event that is run every time a structure is ready to perform some special ability.
+	//__ It will only fire once, so if the time is not right, register your own timer to keep checking.
 	//__
 	virtual bool handle_eventStructureReady(const STRUCTURE *psStruct) override;
 
@@ -489,21 +487,21 @@ public:
 
 	//__ ## eventAttacked(victim, attacker)
 	//__
-	//__ An event that is run when an object belonging to the script's controlling player is
-	//__ attacked. The attacker parameter may be either a structure or a droid.
+	//__ An event that is run when an object belonging to the script's controlling player is attacked.
+	//__ The `attacker` parameter may be either a structure or a droid.
 	//__
 	virtual bool handle_eventAttacked(const BASE_OBJECT *psVictim, const BASE_OBJECT *psAttacker) override;
 
-	//__ ## eventResearched(research, structure, player)
+	//__ ## eventResearched(research, researchStructure, player)
 	//__
-	//__ An event that is run whenever a new research is available. The structure
-	//__ parameter is set if the research comes from a research lab owned by the
-	//__ current player. If an ally does the research, the structure parameter will
-	//__ be set to null. The player parameter gives the player it is called for.
+	//__ An event that is run whenever a new research is available. The `researchStructure`
+	//__ parameter is set if the research comes from a research lab owned by the current player.
+	//__ If an ally does the research, the `researchStructure` parameter will be set to `null`.
+	//__ The `player` parameter gives the player it is called for.
 	//__
 	virtual bool handle_eventResearched(const wzapi::researchResult& research, wzapi::event_nullable_ptr<const STRUCTURE> psStruct, int player) override;
 
-	//__ ## eventDestroyed(object)
+	//__ ## eventDestroyed(gameObject)
 	//__
 	//__ An event that is run whenever an object is destroyed. Careful passing
 	//__ the parameter object around, since it is about to vanish!
@@ -512,8 +510,7 @@ public:
 
 	//__ ## eventPickup(feature, droid)
 	//__
-	//__ An event that is run whenever a feature is picked up. It is called for
-	//__ all players / scripts.
+	//__ An event that is run whenever a feature is picked up. It is called for all players / scripts.
 	//__ Careful passing the parameter object around, since it is about to vanish! (3.2+ only)
 	//__
 	virtual bool handle_eventPickup(const FEATURE *psFeat, const DROID *psDroid) override;
@@ -521,111 +518,105 @@ public:
 	//__ ## eventObjectSeen(viewer, seen)
 	//__
 	//__ An event that is run sometimes when an object, which was marked by an object label,
-	//__ which was reset through resetLabel() to subscribe for events, goes from not seen to seen.
-	//__ An event that is run sometimes when an objectm  goes from not seen to seen.
-	//__ First parameter is **game object** doing the seeing, the next the game
-	//__ object being seen.
+	//__ which was reset through `resetLabel()` to subscribe for events, goes from not seen to seen.
+	//__ An event that is run sometimes when an object goes from not seen to seen.
+	//__ First parameter is **game object** doing the seeing, the next the game object being seen.
 	virtual bool handle_eventObjectSeen(const BASE_OBJECT *psViewer, const BASE_OBJECT *psSeen) override;
 
 	//__
-	//__ ## eventGroupSeen(viewer, group)
+	//__ ## eventGroupSeen(viewer, groupId)
 	//__
 	//__ An event that is run sometimes when a member of a group, which was marked by a group label,
-	//__ which was reset through resetLabel() to subscribe for events, goes from not seen to seen.
-	//__ First parameter is **game object** doing the seeing, the next the id of the group
-	//__ being seen.
+	//__ which was reset through `resetLabel()` to subscribe for events, goes from not seen to seen.
+	//__ First parameter is **game object** doing the seeing, the next the id of the group being seen.
 	//__
 	virtual bool handle_eventGroupSeen(const BASE_OBJECT *psViewer, int groupId) override;
 
-	//__ ## eventObjectTransfer(object, from)
+	//__ ## eventObjectTransfer(droidOrStructure, fromPlayer)
 	//__
-	//__ An event that is run whenever an object is transferred between players,
-	//__ for example due to a Nexus Link weapon. The event is called after the
-	//__ object has been transferred, so the target player is in object.player.
-	//__ The event is called for both players.
+	//__ An event that is run whenever an object is transferred between players, for example due
+	//__ to a Nexus Link weapon. The event is called after the object has been transferred,
+	//__ so the target player is in `droidOrStructure.player`. The event is called for both players.
 	//__
-	virtual bool handle_eventObjectTransfer(const BASE_OBJECT *psObj, int from) override;
+	virtual bool handle_eventObjectTransfer(const BASE_OBJECT *psObj, int fromPlayer) override;
 
-	//__ ## eventChat(from, to, message)
+	//__ ## eventChat(fromPlayer, toPlayer, message)
 	//__
-	//__ An event that is run whenever a chat message is received. The ```from``` parameter is the
-	//__ player sending the chat message. For the moment, the ```to``` parameter is always the script
-	//__ player.
+	//__ An event that is run whenever a chat message is received. The `fromPlayer` parameter is the player
+	//__ sending the chat message. For the moment, the `toPlayer` parameter is always the script player.
 	//__
-	virtual bool handle_eventChat(int from, int to, const char *message) override;
+	virtual bool handle_eventChat(int fromPlayer, int toPlayer, const char *message) override;
 
-	//__ ## eventBeacon(x, y, from, to[, message])
+	//__ ## eventBeacon(x, y, fromPlayer, toPlayer[, message])
 	//__
-	//__ An event that is run whenever a beacon message is received. The ```from``` parameter is the
-	//__ player sending the beacon. For the moment, the ```to``` parameter is always the script player.
-	//__ Message may be undefined.
+	//__ An event that is run whenever a beacon message is received. The `fromPlayer` parameter is the
+	//__ player sending the beacon. For the moment, the `toPlayer` parameter is always the script player.
+	//__ Message may be `undefined`.
 	//__
-	virtual bool handle_eventBeacon(int x, int y, int from, int to, optional<const char *> message) override;
+	virtual bool handle_eventBeacon(int x, int y, int fromPlayer, int toPlayer, optional<const char *> message) override;
 
-	//__ ## eventBeaconRemoved(from, to)
+	//__ ## eventBeaconRemoved(fromPlayer, toPlayer)
 	//__
-	//__ An event that is run whenever a beacon message is removed. The ```from``` parameter is the
-	//__ player sending the beacon. For the moment, the ```to``` parameter is always the script player.
+	//__ An event that is run whenever a beacon message is removed. The `fromPlayer` parameter is the
+	//__ player sending the beacon. For the moment, the `toPlayer` parameter is always the script player.
 	//__
-	virtual bool handle_eventBeaconRemoved(int from, int to) override;
+	virtual bool handle_eventBeaconRemoved(int fromPlayer, int toPlayer) override;
 
-	//__ ## eventGroupLoss(object, groupId, newSize)
+	//__ ## eventGroupLoss(gameObject, groupId, newGroupSize)
 	//__
 	//__ An event that is run whenever a group becomes empty. Input parameter
 	//__ is the about to be killed object, the group's id, and the new group size.
 	//__
 //		// Since groups are entities local to one context, we do not iterate over them here.
-	virtual bool handle_eventGroupLoss(const BASE_OBJECT *psObj, int group, int size) override;
+	virtual bool handle_eventGroupLoss(const BASE_OBJECT *psObj, int groupId, int newGroupSize) override;
 
 	//__ ## eventArea<label>(droid)
 	//__
-	//__ An event that is run whenever a droid enters an area label. The area is then
-	//__ deactived. Call resetArea() to reactivate it. The name of the event is
-	//__ `eventArea${label}`.
+	//__ An event that is run whenever a droid enters an area label. The area is then deactived.
+	//__ Call `resetArea()` to reactivate it. The name of the event is `eventArea${label}()`.
 	//__
 	virtual bool handle_eventArea(const std::string& label, const DROID *psDroid) override;
 
 	//__ ## eventDesignCreated(template)
 	//__
-	//__ An event that is run whenever a new droid template is created. It is only
-	//__ run on the client of the player designing the template.
+	//__ An event that is run whenever a new droid template is created.
+	//__ It is only run on the client of the player designing the template.
 	//__
 	virtual bool handle_eventDesignCreated(const DROID_TEMPLATE *psTemplate) override;
 
-	//__ ## eventAllianceOffer(from, to)
+	//__ ## eventAllianceOffer(fromPlayer, toPlayer)
 	//__
 	//__ An event that is called whenever an alliance offer is requested.
 	//__
-	virtual bool handle_eventAllianceOffer(uint8_t from, uint8_t to) override;
+	virtual bool handle_eventAllianceOffer(uint8_t fromPlayer, uint8_t toPlayer) override;
 
-	//__ ## eventAllianceAccepted(from, to)
+	//__ ## eventAllianceAccepted(fromPlayer, toPlayer)
 	//__
 	//__ An event that is called whenever an alliance is accepted.
 	//__
-	virtual bool handle_eventAllianceAccepted(uint8_t from, uint8_t to) override;
+	virtual bool handle_eventAllianceAccepted(uint8_t fromPlayer, uint8_t toPlayer) override;
 
-	//__ ## eventAllianceBroken(from, to)
+	//__ ## eventAllianceBroken(fromPlayer, toPlayer)
 	//__
 	//__ An event that is called whenever an alliance is broken.
 	//__
-	virtual bool handle_eventAllianceBroken(uint8_t from, uint8_t to) override;
+	virtual bool handle_eventAllianceBroken(uint8_t fromPlayer, uint8_t toPlayer) override;
 
 public:
 	// MARK: Special input events
 
-	//__ ## eventSyncRequest(req_id, x, y, obj_id, obj_id2)
+	//__ ## eventSyncRequest(from, reqId, x, y, objId1, objId2)
 	//__
-	//__ An event that is called from a script and synchronized with all other scripts and hosts
-	//__ to prevent desync from happening. Sync requests must be carefully validated to prevent
-	//__ cheating!
+	//__ An event that is called from a script and synchronized with all other scripts and hosts to
+	//__ prevent desync from happening. Sync requests must be carefully validated to prevent cheating!
 	//__
-	virtual bool handle_eventSyncRequest(int from, int req_id, int x, int y, const BASE_OBJECT *psObj, const BASE_OBJECT *psObj2) override;
+	virtual bool handle_eventSyncRequest(int from, int reqId, int x, int y, const BASE_OBJECT *psObj1, const BASE_OBJECT *psObj2) override;
 
-	//__ ## eventKeyPressed(meta, key)
+	//__ ## eventKeyPressed(metaKeyCode, keyCode)
 	//__
 	//__ An event that is called whenever user presses a key in the game, not counting chat
 	//__ or other pop-up user interfaces. The key values are currently undocumented.
-	virtual bool handle_eventKeyPressed(int meta, int key) override;
+	virtual bool handle_eventKeyPressed(int metaKeyCode, int keyCode) override;
 };
 
 // private QuickJS bureaucracy
@@ -699,13 +690,13 @@ int JS_DeletePropertyStr(JSContext *ctx, JSValueConst this_obj,
 }
 
 // Forward-declare
+JSValue convObj(const BASE_OBJECT *psObj, JSContext *ctx);
 JSValue convDroid(const DROID *psDroid, JSContext *ctx);
 JSValue convStructure(const STRUCTURE *psStruct, JSContext *ctx);
-JSValue convObj(const BASE_OBJECT *psObj, JSContext *ctx);
 JSValue convFeature(const FEATURE *psFeature, JSContext *ctx);
-JSValue convMax(const BASE_OBJECT *psObj, JSContext *ctx);
-JSValue convTemplate(const DROID_TEMPLATE *psTemplate, JSContext *ctx);
 JSValue convResearch(const RESEARCH *psResearch, JSContext *ctx, int player);
+JSValue convTemplate(const DROID_TEMPLATE *psTemplate, JSContext *ctx);
+JSValue convMax(const BASE_OBJECT *psObj, JSContext *ctx);
 
 static int QuickJS_DefinePropertyValue(JSContext *ctx, JSValueConst this_obj, const char* prop, JSValue val, int flags)
 {
@@ -715,217 +706,115 @@ static int QuickJS_DefinePropertyValue(JSContext *ctx, JSValueConst this_obj, co
 	return ret;
 }
 
-//;; ## Research
+//;; ## Base Object
 //;;
-//;; Describes a research item. The following properties are defined:
+//;; Describes a basic object. It will always be a **Droid**, **Structure** or **Feature**,
+//;; but sometimes the difference does not matter, and you can treat any of them simply as a basic object.
+//;; These fields are also inherited by the **Droid**, **Structure** and **Feature** objects.
+//;; The following properties are defined:
 //;;
-//;; * ```power``` Number of power points needed for starting the research.
-//;; * ```points``` Number of research points needed to complete the research.
-//;; * ```started``` A boolean saying whether or not this research has been started by current player or any of its allies.
-//;; * ```done``` A boolean saying whether or not this research has been completed.
-//;; * ```name``` A string containing the full name of the research.
-//;; * ```id``` A string containing the index name of the research.
-//;; * ```type``` The type will always be ```RESEARCH_DATA```.
+//;; * `type` It will be one of `DROID`, `STRUCTURE` or `FEATURE`.
+//;; * `id` The unique ID of this object.
+//;; * `x` X position of the object in tiles.
+//;; * `y` Y position of the object in tiles.
+//;; * `z` Z (height) position of the object in tiles.
+//;; * `player` The player owning this object.
+//;; * `selected` A boolean saying whether 'selectedPlayer' has selected this object.
+//;; * `name` A user-friendly name for this object.
+//;; * `health` Percentage that this object is damaged (where 100 means not damaged at all).
+//;; * `armour` Amount of armour points that protect against kinetic weapons.
+//;; * `thermal` Amount of thermal protection that protect against heat based weapons.
+//;; * `born` The game time at which this object was produced or came into the world. (3.2+ only)
 //;;
-JSValue convResearch(const RESEARCH *psResearch, JSContext *ctx, int player)
+JSValue convObj(const BASE_OBJECT *psObj, JSContext *ctx)
 {
-	if (psResearch == nullptr)
-	{
-		return JS_NULL;
-	}
 	JSValue value = JS_NewObject(ctx);
-	QuickJS_DefinePropertyValue(ctx, value, "power", JS_NewInt32(ctx, (int)psResearch->researchPower), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "points", JS_NewInt32(ctx, (int)psResearch->researchPoints), JS_PROP_ENUMERABLE);
-	bool started = false;
-	for (int i = 0; i < game.maxPlayers; i++)
+	ASSERT_OR_RETURN(value, psObj, "No object for conversion");
+	QuickJS_DefinePropertyValue(ctx, value, "id", JS_NewUint32(ctx, psObj->id), 0);
+	QuickJS_DefinePropertyValue(ctx, value, "x", JS_NewInt32(ctx, map_coord(psObj->pos.x)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "y", JS_NewInt32(ctx, map_coord(psObj->pos.y)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "z", JS_NewInt32(ctx, map_coord(psObj->pos.z)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "player", JS_NewUint32(ctx, psObj->player), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "armour", JS_NewInt32(ctx, objArmour(psObj, WC_KINETIC)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "thermal", JS_NewInt32(ctx, objArmour(psObj, WC_HEAT)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "type", JS_NewInt32(ctx, psObj->type), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "selected", JS_NewUint32(ctx, psObj->selected), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "name", JS_NewString(ctx, objInfo(psObj)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "born", JS_NewUint32(ctx, psObj->born), JS_PROP_ENUMERABLE);
+	scripting_engine::GROUPMAP *psMap = scripting_engine::instance().getGroupMap(engineToInstanceMap.at(ctx));
+	if (psMap != nullptr && psMap->map().count(psObj) > 0) // FIXME:
 	{
-		if (aiCheckAlliances(player, i) || player == i)
-		{
-			int bits = asPlayerResList[i][psResearch->index].ResearchStatus;
-			started = started || (bits & STARTED_RESEARCH) || (bits & STARTED_RESEARCH_PENDING) || (bits & RESBITS_PENDING_ONLY);
-		}
-	}
-	QuickJS_DefinePropertyValue(ctx, value, "started", JS_NewBool(ctx, started), JS_PROP_ENUMERABLE); // including whether an ally has started it
-	QuickJS_DefinePropertyValue(ctx, value, "done", JS_NewBool(ctx, IsResearchCompleted(&asPlayerResList[player][psResearch->index])), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "fullname", JS_NewString(ctx, psResearch->name.toUtf8().c_str()), JS_PROP_ENUMERABLE); // temporary
-	QuickJS_DefinePropertyValue(ctx, value, "name", JS_NewString(ctx, psResearch->id.toUtf8().c_str()), JS_PROP_ENUMERABLE); // will be changed to contain fullname
-	QuickJS_DefinePropertyValue(ctx, value, "id", JS_NewString(ctx, psResearch->id.toUtf8().c_str()), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "type", JS_NewInt32(ctx, SCRIPT_RESEARCH), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "results", mapJsonToQuickJSValue(ctx, psResearch->results, 0), JS_PROP_ENUMERABLE);
-	return value;
-}
-
-//;; ## Structure
-//;;
-//;; Describes a structure (building). It inherits all the properties of the base object (see below).
-//;; In addition, the following properties are defined:
-//;;
-//;; * ```status``` The completeness status of the structure. It will be one of ```BEING_BUILT``` and ```BUILT```.
-//;; * ```type``` The type will always be ```STRUCTURE```.
-//;; * ```cost``` What it would cost to build this structure. (3.2+ only)
-//;; * ```stattype``` The stattype defines the type of structure. It will be one of ```HQ```, ```FACTORY```, ```POWER_GEN```,
-//;; ```RESOURCE_EXTRACTOR```, ```LASSAT```, ```DEFENSE```, ```WALL```, ```RESEARCH_LAB```, ```REPAIR_FACILITY```,
-//;; ```CYBORG_FACTORY```, ```VTOL_FACTORY```, ```REARM_PAD```, ```SAT_UPLINK```, ```GATE``` and ```COMMAND_CONTROL```.
-//;; * ```modules``` If the stattype is set to one of the factories, ```POWER_GEN``` or ```RESEARCH_LAB```, then this property is set to the
-//;; number of module upgrades it has.
-//;; * ```canHitAir``` True if the structure has anti-air capabilities. (3.2+ only)
-//;; * ```canHitGround``` True if the structure has anti-ground capabilities. (3.2+ only)
-//;; * ```isSensor``` True if the structure has sensor ability. (3.2+ only)
-//;; * ```isCB``` True if the structure has counter-battery ability. (3.2+ only)
-//;; * ```isRadarDetector``` True if the structure has radar detector ability. (3.2+ only)
-//;; * ```range``` Maximum range of its weapons. (3.2+ only)
-//;; * ```hasIndirect``` One or more of the structure's weapons are indirect. (3.2+ only)
-//;;
-JSValue convStructure(const STRUCTURE *psStruct, JSContext *ctx)
-{
-	bool aa = false;
-	bool ga = false;
-	bool indirect = false;
-	int range = -1;
-	for (int i = 0; i < psStruct->numWeaps; i++)
-	{
-		if (psStruct->asWeaps[i].nStat)
-		{
-			WEAPON_STATS *psWeap = &asWeaponStats[psStruct->asWeaps[i].nStat];
-			aa = aa || psWeap->surfaceToAir & SHOOT_IN_AIR;
-			ga = ga || psWeap->surfaceToAir & SHOOT_ON_GROUND;
-			indirect = indirect || psWeap->movementModel == MM_INDIRECT || psWeap->movementModel == MM_HOMINGINDIRECT;
-			range = MAX(proj_GetLongRange(psWeap, psStruct->player), range);
-		}
-	}
-	JSValue value = convObj(psStruct, ctx);
-	QuickJS_DefinePropertyValue(ctx, value, "isCB", JS_NewBool(ctx, structCBSensor(psStruct)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "isSensor", JS_NewBool(ctx, structStandardSensor(psStruct)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "canHitAir", JS_NewBool(ctx, aa), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "canHitGround", JS_NewBool(ctx, ga), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "hasIndirect", JS_NewBool(ctx, indirect), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "isRadarDetector", JS_NewBool(ctx, objRadarDetector(psStruct)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "range", JS_NewInt32(ctx, range), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "status", JS_NewInt32(ctx, (int)psStruct->status), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "health", JS_NewInt32(ctx, 100 * psStruct->body / MAX(1, structureBody(psStruct))), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "cost", JS_NewInt32(ctx, psStruct->pStructureType->powerToBuild), JS_PROP_ENUMERABLE);
-	int stattype = 0;
-	switch (psStruct->pStructureType->type) // don't bleed our source insanities into the scripting world
-	{
-	case REF_WALL:
-	case REF_WALLCORNER:
-	case REF_GATE:
-		stattype = (int)REF_WALL;
-		break;
-	case REF_GENERIC:
-	case REF_DEFENSE:
-		stattype = (int)REF_DEFENSE;
-		break;
-	default:
-		stattype = (int)psStruct->pStructureType->type;
-		break;
-	}
-	QuickJS_DefinePropertyValue(ctx, value, "stattype", JS_NewInt32(ctx, stattype), JS_PROP_ENUMERABLE);
-	if (psStruct->pStructureType->type == REF_FACTORY || psStruct->pStructureType->type == REF_CYBORG_FACTORY
-	    || psStruct->pStructureType->type == REF_VTOL_FACTORY
-	    || psStruct->pStructureType->type == REF_RESEARCH
-	    || psStruct->pStructureType->type == REF_POWER_GEN)
-	{
-		QuickJS_DefinePropertyValue(ctx, value, "modules", JS_NewUint32(ctx, psStruct->capacity), JS_PROP_ENUMERABLE);
+		int group = psMap->map().at(psObj); // FIXME:
+		QuickJS_DefinePropertyValue(ctx, value, "group", JS_NewInt32(ctx, group), JS_PROP_ENUMERABLE);
 	}
 	else
 	{
-		QuickJS_DefinePropertyValue(ctx, value, "modules", JS_NULL, JS_PROP_ENUMERABLE);
+		QuickJS_DefinePropertyValue(ctx, value, "group", JS_NULL, JS_PROP_ENUMERABLE);
 	}
-	JSValue weaponlist = JS_NewArray(ctx);
-	for (int j = 0; j < psStruct->numWeaps; j++)
-	{
-		JSValue weapon = JS_NewObject(ctx);
-		const WEAPON_STATS *psStats = asWeaponStats + psStruct->asWeaps[j].nStat;
-		QuickJS_DefinePropertyValue(ctx, weapon, "fullname", JS_NewString(ctx, psStats->name.toUtf8().c_str()), JS_PROP_ENUMERABLE);
-		QuickJS_DefinePropertyValue(ctx, weapon, "name", JS_NewString(ctx, psStats->id.toUtf8().c_str()), JS_PROP_ENUMERABLE); // will be changed to contain full name
-		QuickJS_DefinePropertyValue(ctx, weapon, "id", JS_NewString(ctx, psStats->id.toUtf8().c_str()), JS_PROP_ENUMERABLE);
-		QuickJS_DefinePropertyValue(ctx, weapon, "lastFired", JS_NewUint32(ctx, psStruct->asWeaps[j].lastFired), JS_PROP_ENUMERABLE);
-		JS_DefinePropertyValueUint32(ctx, weaponlist, j, weapon, JS_PROP_ENUMERABLE);
-	}
-	QuickJS_DefinePropertyValue(ctx, value, "weapons", weaponlist, JS_PROP_ENUMERABLE);
-	return value;
-}
-
-//;; ## Feature
-//;;
-//;; Describes a feature (a **game object** not owned by any player). It inherits all the properties of the base object (see below).
-//;; In addition, the following properties are defined:
-//;; * ```type``` It will always be ```FEATURE```.
-//;; * ```stattype``` The type of feature. Defined types are ```OIL_RESOURCE```, ```OIL_DRUM``` and ```ARTIFACT```.
-//;; * ```damageable``` Can this feature be damaged?
-//;;
-JSValue convFeature(const FEATURE *psFeature, JSContext *ctx)
-{
-	JSValue value = convObj(psFeature, ctx);
-	const FEATURE_STATS *psStats = psFeature->psStats;
-	QuickJS_DefinePropertyValue(ctx, value, "health", JS_NewUint32(ctx, 100 * psStats->body / MAX(1, psFeature->body)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "damageable", JS_NewBool(ctx, psStats->damageable), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "stattype", JS_NewInt32(ctx, psStats->subType), JS_PROP_ENUMERABLE);
 	return value;
 }
 
 //;; ## Droid
 //;;
-//;; Describes a droid. It inherits all the properties of the base object (see below).
+//;; Describes a droid. It inherits all the properties of the **Base Object** (see above).
 //;; In addition, the following properties are defined:
 //;;
-//;; * ```type``` It will always be ```DROID```.
-//;; * ```order``` The current order of the droid. This is its plan. The following orders are defined:
-//;;   * ```DORDER_ATTACK``` Order a droid to attack something.
-//;;   * ```DORDER_MOVE``` Order a droid to move somewhere.
-//;;   * ```DORDER_SCOUT``` Order a droid to move somewhere and stop to attack anything on the way.
-//;;   * ```DORDER_BUILD``` Order a droid to build something.
-//;;   * ```DORDER_HELPBUILD``` Order a droid to help build something.
-//;;   * ```DORDER_LINEBUILD``` Order a droid to build something repeatedly in a line.
-//;;   * ```DORDER_REPAIR``` Order a droid to repair something.
-//;;   * ```DORDER_PATROL``` Order a droid to patrol.
-//;;   * ```DORDER_DEMOLISH``` Order a droid to demolish something.
-//;;   * ```DORDER_EMBARK``` Order a droid to embark on a transport.
-//;;   * ```DORDER_DISEMBARK``` Order a transport to disembark its units at the given position.
-//;;   * ```DORDER_FIRESUPPORT``` Order a droid to fire at whatever the target sensor is targeting. (3.2+ only)
-//;;   * ```DORDER_COMMANDERSUPPORT``` Assign the droid to a commander. (3.2+ only)
-//;;   * ```DORDER_STOP``` Order a droid to stop whatever it is doing. (3.2+ only)
-//;;   * ```DORDER_RTR``` Order a droid to return for repairs. (3.2+ only)
-//;;   * ```DORDER_RTB``` Order a droid to return to base. (3.2+ only)
-//;;   * ```DORDER_HOLD``` Order a droid to hold its position. (3.2+ only)
-//;;   * ```DORDER_REARM``` Order a VTOL droid to rearm. If given a target, will go to specified rearm pad. If not, will go to nearest rearm pad. (3.2+ only)
-//;;   * ```DORDER_OBSERVE``` Order a droid to keep a target in sensor view. (3.2+ only)
-//;;   * ```DORDER_RECOVER``` Order a droid to pick up something. (3.2+ only)
-//;;   * ```DORDER_RECYCLE``` Order a droid to factory for recycling. (3.2+ only)
-//;; * ```action``` The current action of the droid. This is how it intends to carry out its plan. The
-//;; C++ code may change the action frequently as it tries to carry out its order. You never want to set
-//;; the action directly, but it may be interesting to look at what it currently is.
-//;; * ```droidType``` The droid's type. The following types are defined:
-//;;   * ```DROID_CONSTRUCT``` Trucks and cyborg constructors.
-//;;   * ```DROID_WEAPON``` Droids with weapon turrets, except cyborgs.
-//;;   * ```DROID_PERSON``` Non-cyborg two-legged units, like scavengers.
-//;;   * ```DROID_REPAIR``` Units with repair turret, including repair cyborgs.
-//;;   * ```DROID_SENSOR``` Units with sensor turret.
-//;;   * ```DROID_ECM``` Unit with ECM jammer turret.
-//;;   * ```DROID_CYBORG``` Cyborgs with weapons.
-//;;   * ```DROID_TRANSPORTER``` Cyborg transporter.
-//;;   * ```DROID_SUPERTRANSPORTER``` Droid transporter.
-//;;   * ```DROID_COMMAND``` Commanders.
-//;; * ```group``` The group this droid is member of. This is a numerical ID. If not a member of any group, will be set to \emph{null}.
-//;; * ```armed``` The percentage of weapon capability that is fully armed. Will be \emph{null} for droids other than VTOLs.
-//;; * ```experience``` Amount of experience this droid has, based on damage it has dealt to enemies.
-//;; * ```cost``` What it would cost to build the droid. (3.2+ only)
-//;; * ```isVTOL``` True if the droid is VTOL. (3.2+ only)
-//;; * ```canHitAir``` True if the droid has anti-air capabilities. (3.2+ only)
-//;; * ```canHitGround``` True if the droid has anti-ground capabilities. (3.2+ only)
-//;; * ```isSensor``` True if the droid has sensor ability. (3.2+ only)
-//;; * ```isCB``` True if the droid has counter-battery ability. (3.2+ only)
-//;; * ```isRadarDetector``` True if the droid has radar detector ability. (3.2+ only)
-//;; * ```hasIndirect``` One or more of the droid's weapons are indirect. (3.2+ only)
-//;; * ```range``` Maximum range of its weapons. (3.2+ only)
-//;; * ```body``` The body component of the droid. (3.2+ only)
-//;; * ```propulsion``` The propulsion component of the droid. (3.2+ only)
-//;; * ```weapons``` The weapon components of the droid, as an array. Contains 'name', 'id', 'armed' percentage and 'lastFired' properties. (3.2+ only)
-//;; * ```cargoCapacity``` Defined for transporters only: Total cargo capacity (number of items that will fit may depend on their size). (3.2+ only)
-//;; * ```cargoSpace``` Defined for transporters only: Cargo capacity left. (3.2+ only)
-//;; * ```cargoCount``` Defined for transporters only: Number of individual \emph{items} in the cargo hold. (3.2+ only)
-//;; * ```cargoSize``` The amount of cargo space the droid will take inside a transport. (3.2+ only)
+//;; * `type` It will always be `DROID`.
+//;; * `order` The current order of the droid. This is its plan. The following orders are defined:
+//;;   * `DORDER_ATTACK` Order a droid to attack something.
+//;;   * `DORDER_MOVE` Order a droid to move somewhere.
+//;;   * `DORDER_SCOUT` Order a droid to move somewhere and stop to attack anything on the way.
+//;;   * `DORDER_BUILD` Order a droid to build something.
+//;;   * `DORDER_HELPBUILD` Order a droid to help build something.
+//;;   * `DORDER_LINEBUILD` Order a droid to build something repeatedly in a line.
+//;;   * `DORDER_REPAIR` Order a droid to repair something.
+//;;   * `DORDER_PATROL` Order a droid to patrol.
+//;;   * `DORDER_DEMOLISH` Order a droid to demolish something.
+//;;   * `DORDER_EMBARK` Order a droid to embark on a transport.
+//;;   * `DORDER_DISEMBARK` Order a transport to disembark its units at the given position.
+//;;   * `DORDER_FIRESUPPORT` Order a droid to fire at whatever the target sensor is targeting. (3.2+ only)
+//;;   * `DORDER_COMMANDERSUPPORT` Assign the droid to a commander. (3.2+ only)
+//;;   * `DORDER_STOP` Order a droid to stop whatever it is doing. (3.2+ only)
+//;;   * `DORDER_RTR` Order a droid to return for repairs. (3.2+ only)
+//;;   * `DORDER_RTB` Order a droid to return to base. (3.2+ only)
+//;;   * `DORDER_HOLD` Order a droid to hold its position. (3.2+ only)
+//;;   * `DORDER_REARM` Order a VTOL droid to rearm. If given a target, will go to specified rearm pad. If not, will go to nearest rearm pad. (3.2+ only)
+//;;   * `DORDER_OBSERVE` Order a droid to keep a target in sensor view. (3.2+ only)
+//;;   * `DORDER_RECOVER` Order a droid to pick up something. (3.2+ only)
+//;;   * `DORDER_RECYCLE` Order a droid to factory for recycling. (3.2+ only)
+//;; * `action` The current action of the droid. This is how it intends to carry out its plan.
+//;;   The C++ code may change the action frequently as it tries to carry out its order.
+//;;   You never want to set the action directly, but it may be interesting to look at what it currently is.
+//;; * `droidType` The droid's type. The following types are defined:
+//;;   * `DROID_CONSTRUCT` Trucks and cyborg constructors.
+//;;   * `DROID_WEAPON` Droids with weapon turrets, except cyborgs.
+//;;   * `DROID_PERSON` Non-cyborg two-legged units, like scavengers.
+//;;   * `DROID_REPAIR` Units with repair turret, including repair cyborgs.
+//;;   * `DROID_SENSOR` Units with sensor turret.
+//;;   * `DROID_ECM` Unit with ECM jammer turret.
+//;;   * `DROID_CYBORG` Cyborgs with weapons.
+//;;   * `DROID_TRANSPORTER` Cyborg transporter.
+//;;   * `DROID_SUPERTRANSPORTER` Droid transporter.
+//;;   * `DROID_COMMAND` Commanders.
+//;; * `group` The group this droid is member of. This is a numerical ID. If not a member of any group, will be set to \emph{null}.
+//;; * `armed` The percentage of weapon capability that is fully armed. Will be \emph{null} for droids other than VTOLs.
+//;; * `experience` Amount of experience this droid has, based on damage it has dealt to enemies.
+//;; * `cost` What it would cost to build the droid. (3.2+ only)
+//;; * `isVTOL` True if the droid is VTOL. (3.2+ only)
+//;; * `canHitAir` True if the droid has anti-air capabilities. (3.2+ only)
+//;; * `canHitGround` True if the droid has anti-ground capabilities. (3.2+ only)
+//;; * `isSensor` True if the droid has sensor ability. (3.2+ only)
+//;; * `isCB` True if the droid has counter-battery ability. (3.2+ only)
+//;; * `isRadarDetector` True if the droid has radar detector ability. (3.2+ only)
+//;; * `hasIndirect` One or more of the droid's weapons are indirect. (3.2+ only)
+//;; * `range` Maximum range of its weapons. (3.2+ only)
+//;; * `body` The body component of the droid. (3.2+ only)
+//;; * `propulsion` The propulsion component of the droid. (3.2+ only)
+//;; * `weapons` The weapon components of the droid, as an array. Contains 'name', 'id', 'armed' percentage and 'lastFired' properties. (3.2+ only)
+//;; * `cargoCapacity` Defined for transporters only: Total cargo capacity (number of items that will fit may depend on their size). (3.2+ only)
+//;; * `cargoLeft` Defined for transporters only: Cargo capacity left. (3.2+ only)
+//;; * `cargoCount` Defined for transporters only: Number of individual \emph{items} in the cargo hold. (3.2+ only)
+//;; * `cargoSize` The amount of cargo space the droid will take inside a transport. (3.2+ only)
 //;;
 JSValue convDroid(const DROID *psDroid, JSContext *ctx)
 {
@@ -1013,51 +902,155 @@ JSValue convDroid(const DROID *psDroid, JSContext *ctx)
 	return value;
 }
 
-//;; ## Base Object
+//;; ## Structure
 //;;
-//;; Describes a basic object. It will always be a droid, structure or feature, but sometimes the
-//;; difference does not matter, and you can treat any of them simply as a basic object. These
-//;; fields are also inherited by the droid, structure and feature objects.
-//;; The following properties are defined:
+//;; Describes a structure (building). It inherits all the properties of the **Base Object** (see above).
+//;; In addition, the following properties are defined:
 //;;
-//;; * ```type``` It will be one of ```DROID```, ```STRUCTURE``` or ```FEATURE```.
-//;; * ```id``` The unique ID of this object.
-//;; * ```x``` X position of the object in tiles.
-//;; * ```y``` Y position of the object in tiles.
-//;; * ```z``` Z (height) position of the object in tiles.
-//;; * ```player``` The player owning this object.
-//;; * ```selected``` A boolean saying whether 'selectedPlayer' has selected this object.
-//;; * ```name``` A user-friendly name for this object.
-//;; * ```health``` Percentage that this object is damaged (where 100 means not damaged at all).
-//;; * ```armour``` Amount of armour points that protect against kinetic weapons.
-//;; * ```thermal``` Amount of thermal protection that protect against heat based weapons.
-//;; * ```born``` The game time at which this object was produced or came into the world. (3.2+ only)
+//;; * `type` The type will always be `STRUCTURE`.
+//;; * `status` The completeness status of the structure. It will be one of `BEING_BUILT` or `BUILT`.
+//;; * `cost` What it would cost to build this structure. (3.2+ only)
+//;; * `stattype` The stattype defines the type of structure. It will be one of:
+//;;   `HQ`, `FACTORY`, `POWER_GEN`, `RESOURCE_EXTRACTOR`, `LASSAT`, `DEFENSE`, `WALL`, `RESEARCH_LAB`,
+//;;   `REPAIR_FACILITY`, `CYBORG_FACTORY`, `VTOL_FACTORY`, `REARM_PAD`, `SAT_UPLINK`, `GATE` or `COMMAND_CONTROL`.
+//;; * `modules` If the stattype is set to one of the factories, `POWER_GEN` or `RESEARCH_LAB`,
+//;;   then this property is set to the number of module upgrades it has.
+//;; * `canHitAir` True if the structure has anti-air capabilities. (3.2+ only)
+//;; * `canHitGround` True if the structure has anti-ground capabilities. (3.2+ only)
+//;; * `isSensor` True if the structure has sensor ability. (3.2+ only)
+//;; * `isCB` True if the structure has counter-battery ability. (3.2+ only)
+//;; * `isRadarDetector` True if the structure has radar detector ability. (3.2+ only)
+//;; * `range` Maximum range of its weapons. (3.2+ only)
+//;; * `hasIndirect` One or more of the structure's weapons are indirect. (3.2+ only)
 //;;
-JSValue convObj(const BASE_OBJECT *psObj, JSContext *ctx)
+JSValue convStructure(const STRUCTURE *psStruct, JSContext *ctx)
 {
-	JSValue value = JS_NewObject(ctx);
-	ASSERT_OR_RETURN(value, psObj, "No object for conversion");
-	QuickJS_DefinePropertyValue(ctx, value, "id", JS_NewUint32(ctx, psObj->id), 0);
-	QuickJS_DefinePropertyValue(ctx, value, "x", JS_NewInt32(ctx, map_coord(psObj->pos.x)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "y", JS_NewInt32(ctx, map_coord(psObj->pos.y)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "z", JS_NewInt32(ctx, map_coord(psObj->pos.z)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "player", JS_NewUint32(ctx, psObj->player), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "armour", JS_NewInt32(ctx, objArmour(psObj, WC_KINETIC)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "thermal", JS_NewInt32(ctx, objArmour(psObj, WC_HEAT)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "type", JS_NewInt32(ctx, psObj->type), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "selected", JS_NewUint32(ctx, psObj->selected), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "name", JS_NewString(ctx, objInfo(psObj)), JS_PROP_ENUMERABLE);
-	QuickJS_DefinePropertyValue(ctx, value, "born", JS_NewUint32(ctx, psObj->born), JS_PROP_ENUMERABLE);
-	scripting_engine::GROUPMAP *psMap = scripting_engine::instance().getGroupMap(engineToInstanceMap.at(ctx));
-	if (psMap != nullptr && psMap->map().count(psObj) > 0) // FIXME:
+	bool aa = false;
+	bool ga = false;
+	bool indirect = false;
+	int range = -1;
+	for (int i = 0; i < psStruct->numWeaps; i++)
 	{
-		int group = psMap->map().at(psObj); // FIXME:
-		QuickJS_DefinePropertyValue(ctx, value, "group", JS_NewInt32(ctx, group), JS_PROP_ENUMERABLE);
+		if (psStruct->asWeaps[i].nStat)
+		{
+			WEAPON_STATS *psWeap = &asWeaponStats[psStruct->asWeaps[i].nStat];
+			aa = aa || psWeap->surfaceToAir & SHOOT_IN_AIR;
+			ga = ga || psWeap->surfaceToAir & SHOOT_ON_GROUND;
+			indirect = indirect || psWeap->movementModel == MM_INDIRECT || psWeap->movementModel == MM_HOMINGINDIRECT;
+			range = MAX(proj_GetLongRange(psWeap, psStruct->player), range);
+		}
+	}
+	JSValue value = convObj(psStruct, ctx);
+	QuickJS_DefinePropertyValue(ctx, value, "isCB", JS_NewBool(ctx, structCBSensor(psStruct)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "isSensor", JS_NewBool(ctx, structStandardSensor(psStruct)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "canHitAir", JS_NewBool(ctx, aa), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "canHitGround", JS_NewBool(ctx, ga), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "hasIndirect", JS_NewBool(ctx, indirect), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "isRadarDetector", JS_NewBool(ctx, objRadarDetector(psStruct)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "range", JS_NewInt32(ctx, range), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "status", JS_NewInt32(ctx, (int)psStruct->status), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "health", JS_NewInt32(ctx, 100 * psStruct->body / MAX(1, structureBody(psStruct))), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "cost", JS_NewInt32(ctx, psStruct->pStructureType->powerToBuild), JS_PROP_ENUMERABLE);
+	int stattype = 0;
+	switch (psStruct->pStructureType->type) // don't bleed our source insanities into the scripting world
+	{
+	case REF_WALL:
+	case REF_WALLCORNER:
+	case REF_GATE:
+		stattype = (int)REF_WALL;
+		break;
+	case REF_GENERIC:
+	case REF_DEFENSE:
+		stattype = (int)REF_DEFENSE;
+		break;
+	default:
+		stattype = (int)psStruct->pStructureType->type;
+		break;
+	}
+	QuickJS_DefinePropertyValue(ctx, value, "stattype", JS_NewInt32(ctx, stattype), JS_PROP_ENUMERABLE);
+	if (psStruct->pStructureType->type == REF_FACTORY || psStruct->pStructureType->type == REF_CYBORG_FACTORY
+	    || psStruct->pStructureType->type == REF_VTOL_FACTORY
+	    || psStruct->pStructureType->type == REF_RESEARCH
+	    || psStruct->pStructureType->type == REF_POWER_GEN)
+	{
+		QuickJS_DefinePropertyValue(ctx, value, "modules", JS_NewUint32(ctx, psStruct->capacity), JS_PROP_ENUMERABLE);
 	}
 	else
 	{
-		QuickJS_DefinePropertyValue(ctx, value, "group", JS_NULL, JS_PROP_ENUMERABLE);
+		QuickJS_DefinePropertyValue(ctx, value, "modules", JS_NULL, JS_PROP_ENUMERABLE);
 	}
+	JSValue weaponlist = JS_NewArray(ctx);
+	for (int j = 0; j < psStruct->numWeaps; j++)
+	{
+		JSValue weapon = JS_NewObject(ctx);
+		const WEAPON_STATS *psStats = asWeaponStats + psStruct->asWeaps[j].nStat;
+		QuickJS_DefinePropertyValue(ctx, weapon, "fullname", JS_NewString(ctx, psStats->name.toUtf8().c_str()), JS_PROP_ENUMERABLE);
+		QuickJS_DefinePropertyValue(ctx, weapon, "name", JS_NewString(ctx, psStats->id.toUtf8().c_str()), JS_PROP_ENUMERABLE); // will be changed to contain full name
+		QuickJS_DefinePropertyValue(ctx, weapon, "id", JS_NewString(ctx, psStats->id.toUtf8().c_str()), JS_PROP_ENUMERABLE);
+		QuickJS_DefinePropertyValue(ctx, weapon, "lastFired", JS_NewUint32(ctx, psStruct->asWeaps[j].lastFired), JS_PROP_ENUMERABLE);
+		JS_DefinePropertyValueUint32(ctx, weaponlist, j, weapon, JS_PROP_ENUMERABLE);
+	}
+	QuickJS_DefinePropertyValue(ctx, value, "weapons", weaponlist, JS_PROP_ENUMERABLE);
+	return value;
+}
+
+//;; ## Feature
+//;;
+//;; Describes a feature (a **game object** not owned by any player). It inherits all the properties of the **Base Object** (see above).
+//;; In addition, the following properties are defined:
+//;;
+//;; * `type` It will always be `FEATURE`.
+//;; * `stattype` The type of feature. Defined types are `OIL_RESOURCE`, `OIL_DRUM` and `ARTIFACT`.
+//;; * `damageable` Can this feature be damaged?
+//;;
+JSValue convFeature(const FEATURE *psFeature, JSContext *ctx)
+{
+	JSValue value = convObj(psFeature, ctx);
+	const FEATURE_STATS *psStats = psFeature->psStats;
+	QuickJS_DefinePropertyValue(ctx, value, "health", JS_NewUint32(ctx, 100 * psStats->body / MAX(1, psFeature->body)), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "damageable", JS_NewBool(ctx, psStats->damageable), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "stattype", JS_NewInt32(ctx, psStats->subType), JS_PROP_ENUMERABLE);
+	return value;
+}
+
+//;; ## Research
+//;;
+//;; Describes a research item.
+//;; The following properties are defined:
+//;;
+//;; * `type` The type will always be `RESEARCH_DATA`.
+//;; * `id` A string containing the index name of the research.
+//;; * `name` A string containing the full name of the research.
+//;; * `power` Number of power points needed for starting the research.
+//;; * `points` Number of research points needed to complete the research.
+//;; * `started` A boolean saying whether or not this research has been started by current player or any of its allies.
+//;; * `done` A boolean saying whether or not this research has been completed.
+//;;
+JSValue convResearch(const RESEARCH *psResearch, JSContext *ctx, int player)
+{
+	if (psResearch == nullptr)
+	{
+		return JS_NULL;
+	}
+	JSValue value = JS_NewObject(ctx);
+	QuickJS_DefinePropertyValue(ctx, value, "power", JS_NewInt32(ctx, (int)psResearch->researchPower), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "points", JS_NewInt32(ctx, (int)psResearch->researchPoints), JS_PROP_ENUMERABLE);
+	bool started = false;
+	for (int i = 0; i < game.maxPlayers; i++)
+	{
+		if (aiCheckAlliances(player, i) || player == i)
+		{
+			int bits = asPlayerResList[i][psResearch->index].ResearchStatus;
+			started = started || (bits & STARTED_RESEARCH) || (bits & STARTED_RESEARCH_PENDING) || (bits & RESBITS_PENDING_ONLY);
+		}
+	}
+	QuickJS_DefinePropertyValue(ctx, value, "started", JS_NewBool(ctx, started), JS_PROP_ENUMERABLE); // including whether an ally has started it
+	QuickJS_DefinePropertyValue(ctx, value, "done", JS_NewBool(ctx, IsResearchCompleted(&asPlayerResList[player][psResearch->index])), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "fullname", JS_NewString(ctx, psResearch->name.toUtf8().c_str()), JS_PROP_ENUMERABLE); // temporary
+	QuickJS_DefinePropertyValue(ctx, value, "name", JS_NewString(ctx, psResearch->id.toUtf8().c_str()), JS_PROP_ENUMERABLE); // will be changed to contain fullname
+	QuickJS_DefinePropertyValue(ctx, value, "id", JS_NewString(ctx, psResearch->id.toUtf8().c_str()), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "type", JS_NewInt32(ctx, SCRIPT_RESEARCH), JS_PROP_ENUMERABLE);
+	QuickJS_DefinePropertyValue(ctx, value, "results", mapJsonToQuickJSValue(ctx, psResearch->results, 0), JS_PROP_ENUMERABLE);
 	return value;
 }
 
@@ -1066,17 +1059,17 @@ JSValue convObj(const BASE_OBJECT *psObj, JSContext *ctx)
 //;; Describes a template type. Templates are droid designs that a player has created.
 //;; The following properties are defined:
 //;;
-//;; * ```id``` The ID of this object.
-//;; * ```name``` Name of the template.
-//;; * ```cost``` The power cost of the template if put into production.
-//;; * ```droidType``` The type of droid that would be created.
-//;; * ```body``` The name of the body type.
-//;; * ```propulsion``` The name of the propulsion type.
-//;; * ```brain``` The name of the brain type.
-//;; * ```repair``` The name of the repair type.
-//;; * ```ecm``` The name of the ECM (electronic counter-measure) type.
-//;; * ```construct``` The name of the construction type.
-//;; * ```weapons``` An array of weapon names attached to this template.
+//;; * `id` The ID of this object.
+//;; * `name` Name of the template.
+//;; * `cost` The power cost of the template if put into production.
+//;; * `droidType` The type of droid that would be created.
+//;; * `body` The name of the body type.
+//;; * `propulsion` The name of the propulsion type.
+//;; * `brain` The name of the brain type.
+//;; * `repair` The name of the repair type.
+//;; * `ecm` The name of the ECM (electronic counter-measure) type.
+//;; * `construct` The name of the construction type.
+//;; * `weapons` An array of weapon names attached to this template.
 JSValue convTemplate(const DROID_TEMPLATE *psTempl, JSContext *ctx)
 {
 	JSValue value = JS_NewObject(ctx);
@@ -2295,7 +2288,7 @@ static std::string QuickJS_DumpError(JSContext *ctx)
 //--
 //-- Includes another source code file at this point. You should generally only specify the filename,
 //-- not try to specify its path, here.
-//-- However, *if* you specify sub-paths / sub-folders, the path separator should **always** be forward-slash ("/").
+//-- However, *if* you specify sub-paths / sub-folders, the path separator should **always** be forward-slash (`/`).
 //--
 static JSValue js_include(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -2340,7 +2333,7 @@ static JSValue js_include(JSContext *ctx, JSValueConst this_val, int argc, JSVal
 //-- ## includeJSON(filePath)
 //--
 //-- Reads a JSON file and returns an object. You should generally only specify the filename,
-//-- However, *if* you specify sub-paths / sub-folders, the path separator should **always** be forward-slash ("/").
+//-- However, *if* you specify sub-paths / sub-folders, the path separator should **always** be forward-slash (`/`).
 //--
 static JSValue js_includeJSON(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -2401,7 +2394,7 @@ static uniqueTimerID SetQuickJSTimer(JSContext *ctx, int player, const std::stri
 //-- is the first parameter, and it _must be quoted_, otherwise the function will
 //-- be inlined. The second parameter is the interval, in milliseconds. A third, optional
 //-- parameter can be a **game object** to pass to the timer function. If the **game object**
-//-- dies, the timer stops running. The minimum number of milliseconds is 100, but such
+//-- dies, the timer stops running. The minimum number of milliseconds is `100`, but such
 //-- fast timers are strongly discouraged as they may deteriorate the game performance.
 //--
 //-- ```js
@@ -2485,10 +2478,10 @@ static JSValue js_removeTimer(JSContext *ctx, JSValueConst this_val, int argc, J
 //--
 //-- Queues up a function to run at a later game frame. This is useful to prevent
 //-- stuttering during the game, which can happen if too much script processing is
-//-- done at once.  The function to run is the first parameter, and it
+//-- done at once. The function to run is the first parameter, and it
 //-- _must be quoted_, otherwise the function will be inlined.
-//-- The second parameter is the delay in milliseconds, if it is omitted or 0,
-//-- the function will be run at a later frame.  A third optional
+//-- The second parameter is the delay in milliseconds, if it is omitted or `0`,
+//-- the function will be run at a later frame. A third optional
 //-- parameter can be a **game object** to pass to the queued function. If the **game object**
 //-- dies before the queued call runs, nothing happens.
 //--
@@ -3126,7 +3119,7 @@ IMPL_JS_FUNC(addBeacon, wzapi::addBeacon)
 
 //-- ## removeBeacon(playerFilter)
 //--
-//-- Remove a beacon message sent to target player. Target may also be ```ALLIES```.
+//-- Remove a beacon message sent to target player. Target may also be `ALLIES`.
 //-- Returns a boolean that is true on success. (3.2+ only)
 //--
 static JSValue js_removeBeacon(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -3304,10 +3297,10 @@ bool quickjs_scripting_instance::registerFunctions(const std::string& scriptName
 {
 	debug(LOG_WZ, "Loading functions for context %p, script %s", static_cast<void *>(ctx), scriptName.c_str());
 
-	//== * ```Upgrades``` A special array containing per-player rules information for game entity types,
-	//== which can be written to in order to implement upgrades and other dynamic rules changes. Each item in the
-	//== array contains a subset of the sparse array of rules information in the ```Stats``` global.
-	//== These values are defined:
+	//== * `Upgrades` A special array containing per-player rules information for game entity types,
+	//==   which can be written to in order to implement upgrades and other dynamic rules changes.
+	//==   Each item in the array contains a subset of the sparse array of rules information in the `Stats` global.
+	//==   These values are defined:
 	JSValue upgrades = constructUpgradesQuickJSValue(ctx);
 	JS_DefinePropertyValueStr(ctx, global_obj, "Upgrades", upgrades, JS_PROP_WRITABLE | JS_PROP_ENUMERABLE);
 
