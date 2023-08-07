@@ -43,9 +43,14 @@
 
 // If the path finding system is shutdown or not
 static volatile bool fpathQuit = false;
-// Run PF tasks in separate thread.
-// Can be switch off to simplify debugging of PF system.
-constexpr bool fpathAsyncMode = false;
+
+/// Check if PF tasks are running in a separate thread.
+/// Disabling async mode can simplify debugging of PF system.
+/// Making this constant "functional" is more robust and portable than extern const/constexpr.
+bool fpathGetAsyncMode()
+{
+	return true;
+}
 
 /* Beware: Enabling this will cause significant slow-down. */
 #undef DEBUG_MAP
@@ -403,7 +408,7 @@ static FPATH_RETVAL fpathRoute(MOVE_CONTROL *psMove, unsigned id, int startX, in
 	packagedPathJob task([job]() { return fpathExecute(job); });
 	pathResults[id] = task.get_future();
 
-	if (fpathAsyncMode) {
+	if (fpathGetAsyncMode()) {
 		// Add to end of list
 		wzMutexLock(fpathMutex);
 		bool isFirstJob = pathJobs.empty();
