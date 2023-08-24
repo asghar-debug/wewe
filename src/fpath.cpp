@@ -44,6 +44,14 @@
 // If the path finding system is shutdown or not
 static volatile bool fpathQuit = false;
 
+/// Check if PF tasks are running in a separate thread.
+/// Disabling async mode can simplify debugging of PF system.
+/// Making this constant "functional" is more robust and portable than extern const/constexpr.
+bool fpathGetAsyncMode()
+{
+	return true;
+}
+
 /* Beware: Enabling this will cause significant slow-down. */
 #undef DEBUG_MAP
 
@@ -68,13 +76,19 @@ static bool             waitingForResult = false;
 static uint32_t         waitingForResultId;
 static WZ_SEMAPHORE     *waitingForResultSemaphore = nullptr;
 
+/// Last recently used list of contexts.
+std::list<PathfindContext> fpathContexts;
+
 static PATHRESULT fpathExecute(PATHJOB psJob);
 
+static PathMapCache pfMapCache;
 
 /** This runs in a separate thread */
 static int fpathThreadFunc(void *)
 {
 	wzMutexLock(fpathMutex);
+
+	std::list<packagedPathJob> localPathJobs;
 
 	while (!fpathQuit)
 	{
@@ -86,16 +100,19 @@ static int fpathThreadFunc(void *)
 			wzMutexLock(fpathMutex);
 			continue;
 		}
-
-		WZ_PROFILE_SCOPE(fpathJob);
-		// Copy the first job from the queue.
-		packagedPathJob job = std::move(pathJobs.front());
-		pathJobs.pop_front();
-
+		// Take batch of jobs to process them without additional synchronizations.
+		localPathJobs = std::move(pathJobs);
 		wzMutexUnlock(fpathMutex);
-		job();
+		{
+			WZ_PROFILE_SCOPE(fpathJob);
+			while(!localPathJobs.empty()) {
+				// Process jobs one by one
+				packagedPathJob job = std::move(localPathJobs.front());
+				localPathJobs.pop_front();
+				job();
+			}
+		}
 		wzMutexLock(fpathMutex);
-
 		waitingForResult = false;
 		objTrace(waitingForResultId, "These are the droids you are looking for.");
 		wzSemaphorePost(waitingForResultSemaphore);
@@ -123,7 +140,6 @@ bool fpathInitialise()
 	return true;
 }
 
-
 void fpathShutdown()
 {
 	if (fpathThread)
@@ -141,7 +157,9 @@ void fpathShutdown()
 		wzSemaphoreDestroy(waitingForResultSemaphore);
 		waitingForResultSemaphore = nullptr;
 	}
-	fpathHardTableReset();
+
+	fpathContexts.clear();
+	pfMapCache.clear();
 }
 
 
@@ -336,7 +354,7 @@ static FPATH_RETVAL fpathRoute(MOVE_CONTROL *psMove, unsigned id, int startX, in
 	}
 
 	// Check if waiting for a result
-	while (psMove->Status == MOVEWAITROUTE)
+	if (psMove->Status == MOVEWAITROUTE)
 	{
 		objTrace(id, "Checking if we have a path yet");
 
@@ -359,16 +377,13 @@ static FPATH_RETVAL fpathRoute(MOVE_CONTROL *psMove, unsigned id, int startX, in
 
 		objTrace(id, "Got a path to (%d, %d)! Length=%d Retval=%d", psMove->destination.x, psMove->destination.y, (int)psMove->asPath.size(), (int)retval);
 		syncDebug("fpathRoute(..., %d, %d, %d, %d, %d, %d, %d, %d, %d) = %d, path[%d] = %08X->(%d, %d)", id, startX, startY, tX, tY, propulsionType, droidType, moveType, owner, retval, (int)psMove->asPath.size(), ~crcSumVector2i(0, psMove->asPath.data(), psMove->asPath.size()), psMove->destination.x, psMove->destination.y);
-
-		if (!correctDestination)
+		// There was some probability that we get result from older pathfinding request.
+		// So we must check that we've got the path to the correct goal.
+		if (correctDestination)
 		{
-			goto queuePathfinding;  // Seems we got the result of an old pathfinding job for this droid, so need to pathfind again.
+			return retval;
 		}
-
-		return retval;
 	}
-queuePathfinding:
-
 	// We were not waiting for a result, and found no trivial path, so create new job and start waiting
 	PATHJOB job;
 	job.origX = startX;
@@ -383,9 +398,9 @@ queuePathfinding:
 	job.owner = owner;
 	job.acceptNearest = acceptNearest;
 	job.deleted = false;
-	fpathSetBlockingMap(&job);
+	pfMapCache.assignBlockingMap(job);
 
-	debug(LOG_NEVER, "starting new job for droid %d 0x%x", id, id);
+	debug(LOG_NEVER, "starting new job for droid %d 0x%x (%d;%d) to (%d;%d)", id, id, startX, startY, tX, tY);
 	// Clear any results or jobs waiting already. It is a vital assumption that there is only one
 	// job or result for each droid in the system at any time.
 	fpathRemoveDroidData(id);
@@ -393,18 +408,22 @@ queuePathfinding:
 	packagedPathJob task([job]() { return fpathExecute(job); });
 	pathResults[id] = task.get_future();
 
-	// Add to end of list
-	wzMutexLock(fpathMutex);
-	bool isFirstJob = pathJobs.empty();
-	pathJobs.push_back(std::move(task));
-	wzMutexUnlock(fpathMutex);
+	if (fpathGetAsyncMode()) {
+		// Add to end of list
+		wzMutexLock(fpathMutex);
+		bool isFirstJob = pathJobs.empty();
+		pathJobs.push_back(std::move(task));
+		wzMutexUnlock(fpathMutex);
 
-	if (isFirstJob)
-	{
-		wzSemaphorePost(fpathSemaphore);  // Wake up processing thread.
+		if (isFirstJob)
+		{
+			wzSemaphorePost(fpathSemaphore);  // Wake up processing thread.
+		}
+		objTrace(id, "Queued up a path-finding request to (%d, %d), at least %d items earlier in queue", tX, tY, isFirstJob);
+	} else {
+		task();
 	}
 
-	objTrace(id, "Queued up a path-finding request to (%d, %d), at least %d items earlier in queue", tX, tY, isFirstJob);
 	syncDebug("fpathRoute(..., %d, %d, %d, %d, %d, %d, %d, %d, %d) = FPR_WAIT", id, startX, startY, tX, tY, propulsionType, droidType, moveType, owner);
 	return FPR_WAIT;	// wait while polling result queue
 }
@@ -462,7 +481,7 @@ PATHRESULT fpathExecute(PATHJOB job)
 	result.retval = FPR_FAILED;
 	result.originalDest = Vector2i(job.destX, job.destY);
 
-	ASR_RETVAL retval = fpathAStarRoute(&result.sMove, &job);
+	ASR_RETVAL retval = fpathAStarRoute(fpathContexts, &result.sMove, &job);
 
 	ASSERT(retval != ASR_OK || result.sMove.asPath.size() > 0, "Ok result but no path in result");
 	switch (retval)

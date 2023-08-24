@@ -86,6 +86,7 @@
 #include "animation.h"
 #include "faction.h"
 #include "wzcrashhandlingproviders.h"
+#include "drawPath.h"
 
 /********************  Prototypes  ********************/
 
@@ -161,7 +162,6 @@ static SDWORD	rangeCenterX, rangeCenterY, rangeRadius;
 static bool	bDrawProximitys = true;
 bool	godMode;
 bool	showGateways = false;
-bool	showPath = false;
 
 // Skybox data
 static float wind = 0.0f;
@@ -769,41 +769,6 @@ static PIELIGHT structureBrightness(STRUCTURE *psStructure)
 	return buildingBrightness;
 }
 
-
-/// Show all droid movement parts by displaying an explosion at every step
-static void showDroidPaths()
-{
-	if ((graphicsTime / 250 % 2) != 0)
-	{
-		return;
-	}
-
-	if (selectedPlayer >= MAX_PLAYERS)
-	{
-		return; // no-op for now
-	}
-
-	for (DROID *psDroid = apsDroidLists[selectedPlayer]; psDroid; psDroid = psDroid->psNext)
-	{
-		if (psDroid->selected && psDroid->sMove.Status != MOVEINACTIVE)
-		{
-			const int len = psDroid->sMove.asPath.size();
-			for (int i = std::max(psDroid->sMove.pathIndex - 1, 0); i < len; i++)
-			{
-				Vector3i pos;
-
-				ASSERT(worldOnMap(psDroid->sMove.asPath[i].x, psDroid->sMove.asPath[i].y), "Path off map!");
-				pos.x = psDroid->sMove.asPath[i].x;
-				pos.z = psDroid->sMove.asPath[i].y;
-				pos.y = map_Height(pos.x, pos.z) + 16;
-
-				effectGiveAuxVar(80);
-				addEffect(&pos, EFFECT_EXPLOSION, EXPLOSION_TYPE_LASER, false, nullptr, 0);
-			}
-		}
-	}
-}
-
 /// Displays an image for the Network Issue button
 static void NetworkDisplayImage(WIDGET *psWidget, UDWORD xOffset, UDWORD yOffset)
 {
@@ -1181,11 +1146,6 @@ void draw3DScene()
 		drawRangeAtPos(rangeCenterX, rangeCenterY, rangeRadius);
 	}
 
-	if (showPath)
-	{
-		showDroidPaths();
-	}
-
 	wzPerfEnd(PERF_MISC);
 }
 
@@ -1429,6 +1389,7 @@ static void drawTiles(iView *player)
 	drawTerrain(perspectiveViewMatrix, cameraPos, -getTheSun());
 	wzPerfEnd(PERF_TERRAIN);
 
+	drawPathCostLayer(selectedPlayer, *player, viewMatrix, perspectiveViewMatrix);
 	// draw skybox
 	// NOTE: Must come *after* drawTerrain *if* using the fallback (old) terrain shaders
 	wzPerfBegin(PERF_SKYBOX, "3D scene - skybox");
