@@ -96,7 +96,9 @@ bool			bLimiterLoaded = false;
 static std::shared_ptr<IMAGEFILE> pFlagsImages;
 
 #define TUTORIAL_LEVEL "TUTORIAL3"
-#define TRANSLATION_URL "https://translate.wz2100.net"
+#define HOMEPAGE_URL "https://wz2100.net/"
+#define DONATIONS_URL "https://donations.wz2100.net/"
+#define TRANSLATION_URL "https://translate.wz2100.net/"
 
 // ////////////////////////////////////////////////////////////////////////////
 // Forward definitions
@@ -163,12 +165,12 @@ static void runUpgrdHyperlink()
 
 static void runHyperlink()
 {
-	openURLInBrowser("https://wz2100.net/");
+	openURLInBrowser(HOMEPAGE_URL);
 }
 
 static void rundonatelink()
 {
-	openURLInBrowser("http://donations.wz2100.net/");
+	openURLInBrowser(DONATIONS_URL);
 }
 
 static void runchatlink()
@@ -217,7 +219,7 @@ void startTitleMenu()
 	else
 	{
 		addTextButton(FRONTEND_PLAYINTRO, FRONTEND_POS6X, FRONTEND_POS6Y, _("View Intro"), WBUT_TXTCENTRE | WBUT_DISABLE);
-		widgSetTip(psWScreen, FRONTEND_PLAYINTRO, _("Videos are missing, download them from http://wz2100.net"));
+		widgSetTip(psWScreen, FRONTEND_PLAYINTRO, astringf(_("Videos are missing, download them from %s"), HOMEPAGE_URL).c_str());
 
 		notifyAboutMissingVideos();
 	}
@@ -234,9 +236,9 @@ void startTitleMenu()
 	addTextButton(FRONTEND_QUIT, FRONTEND_POS8X, FRONTEND_POS8Y, _("Quit Game"), WBUT_TXTCENTRE);
 	addSideText(FRONTEND_SIDETEXT, FRONTEND_SIDEX, FRONTEND_SIDEY, _("MAIN MENU"));
 
-	addSmallTextButton(FRONTEND_HYPERLINK, FRONTEND_POS9X, FRONTEND_POS9Y, _("Official site: http://wz2100.net/"), 0);
+	addSmallTextButton(FRONTEND_HYPERLINK, FRONTEND_POS9X, FRONTEND_POS9Y, astringf(_("Official site: %s"), HOMEPAGE_URL).c_str(), 0);
 	widgSetTip(psWScreen, FRONTEND_HYPERLINK, _("Come visit the forums and all Warzone 2100 news! Click this link."));
-	W_BUTTON * pRightAlignedButton = addSmallTextButton(FRONTEND_DONATELINK, FRONTEND_POS9X + 360, FRONTEND_POS9Y, _("Donate: http://donations.wz2100.net/"), 0);
+	W_BUTTON * pRightAlignedButton = addSmallTextButton(FRONTEND_DONATELINK, FRONTEND_POS9X + 360, FRONTEND_POS9Y, astringf(_("Donate: %s"), DONATIONS_URL).c_str(), 0);
 	moveToParentRightEdge(pRightAlignedButton, 1);
 	widgSetTip(psWScreen, FRONTEND_DONATELINK, _("Help support the project with our server costs, Click this link."));
 	pRightAlignedButton = addSmallTextButton(FRONTEND_CHATLINK, FRONTEND_POS9X + 360, 0, _("Chat with players on Discord or IRC"), 0);
@@ -382,7 +384,7 @@ void startSinglePlayerMenu()
 	// show this only when the video sequences are not installed
 	if (!seq_hasVideos())
 	{
-		addSmallTextButton(FRONTEND_HYPERLINK, FRONTEND_POS9X, FRONTEND_POS9Y, _("Campaign videos are missing! Get them from http://wz2100.net"), 0);
+		addSmallTextButton(FRONTEND_HYPERLINK, FRONTEND_POS9X, FRONTEND_POS9Y, astringf(_("Campaign videos are missing! Get them from %s"), HOMEPAGE_URL).c_str(), 0);
 		notifyAboutMissingVideos();
 	}
 }
@@ -404,7 +406,7 @@ void startCampaignSelector()
 	// show this only when the video sequences are not installed
 	if (!seq_hasVideos())
 	{
-		addSmallTextButton(FRONTEND_HYPERLINK, FRONTEND_POS9X, FRONTEND_POS9Y, _("Campaign videos are missing! Get them from http://wz2100.net"), 0);
+		addSmallTextButton(FRONTEND_HYPERLINK, FRONTEND_POS9X, FRONTEND_POS9Y, astringf(_("Campaign videos are missing! Get them from %s"), HOMEPAGE_URL).c_str(), 0);
 		notifyAboutMissingVideos();
 	}
 }
