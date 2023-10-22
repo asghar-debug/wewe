@@ -506,7 +506,7 @@ void recycleDroid(DROID *psDroid)
 	{
 		addEffect(&position, EFFECT_EXPLOSION, EXPLOSION_TYPE_DISCOVERY, false, nullptr, false, gameTime - deltaGameTime + 1);
 	}
-	
+
 	CHECK_DROID(psDroid);
 }
 
@@ -872,7 +872,7 @@ void droidUpdate(DROID *psDroid)
 		droidUpdateDroidSelfRepair(psDroid);
 	}
 
-	
+
 	/* Update the fire damage data */
 	if (psDroid->periodicalDamageStart != 0 && psDroid->periodicalDamageStart != gameTime - deltaGameTime)  // -deltaGameTime, since projectiles are updated after droids.
 	{
@@ -1246,7 +1246,7 @@ void droidWasFullyRepaired(DROID *psDroid, const REPAIR_FACILITY *psRepairFac)
 		objTrace(psDroid->id, "Repair complete - guarding the place at x=%i y=%i", psDroid->pos.x, psDroid->pos.y);
 		orderDroidLoc(psDroid, DORDER_GUARD, psDroid->pos.x, psDroid->pos.y, ModeImmediate);
 	}
-} 
+}
 
 bool droidUpdateRepair(DROID *psDroid)
 {

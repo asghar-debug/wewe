@@ -1789,13 +1789,13 @@ static void dealWithLMBStructure(STRUCTURE *psStructure, SELECTION_TYPE selectio
 {
 	bool ownStruct = (psStructure->player == selectedPlayer);
 	const bool isSpectator = bMultiPlayer && NetPlay.players[selectedPlayer].isSpectator;
-	
+
 	if (isSpectator)
 	{
 		printStructureInfo(psStructure);
 		return;
 	}
-	
+
 	if (selectedPlayer < MAX_PLAYERS && !aiCheckAlliances(psStructure->player, selectedPlayer))
 	{
 		/* We've clicked on an enemy building */
