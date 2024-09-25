@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: warzone2100\n"
 "Report-Msgid-Bugs-To: warzone2100-project@lists.sourceforge.net\n"
-"POT-Creation-Date: 2024-09-11 19:20+0000\n"
+"POT-Creation-Date: 2024-09-25 19:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3419,7 +3419,7 @@ msgstr ""
 #. data/mp/messages/resmessages2.json: $.RES_W_BMB1.text[2]
 #: data/base/messages/strings/resstrings.txt:699
 #: data/mp/messages/strings/resstrings.txt:338
-#: po/custom/fromJson.txt:1086
+#: po/custom/fromJson.txt:1089
 msgid "Best Targets: Base Structures"
 msgstr ""
 
@@ -7241,7 +7241,7 @@ msgstr ""
 
 #. TRANSLATORS:
 #. data/mp/messages/resmessages12.json: $.RES_W_RK_MRL1.text[2]
-#: po/custom/fromJson.txt:1089
+#: po/custom/fromJson.txt:1086
 msgid "Best Targets: Base structures"
 msgstr ""
 
@@ -11750,19 +11750,19 @@ msgid "New Systems Tower Available"
 msgstr ""
 
 #. TRANSLATORS:
-#. data/base/messages/resmessagesall.json: $.RES_SENSO1.text[0]
-#. data/mp/messages/resmessagesall.json: $.RES_SENSO1.text[0]
-#: po/custom/fromJson.txt:4266
-msgid "New Systems Turret Available For Design"
-msgstr ""
-
-#. TRANSLATORS:
 #. data/base/messages/resmessages1.json: $.RES_C_CT1.text[0]
 #. data/base/messages/resmessages12.json: $.RES_SY_CBSTU1.text[0]
 #. data/mp/messages/resmessages1.json: $.RES_C_CT1.text[0]
 #. data/mp/messages/resmessages12.json: $.RES_SY_CBSTU1.text[0]
-#: po/custom/fromJson.txt:4272
+#: po/custom/fromJson.txt:4268
 msgid "New Systems Turret Available for Design"
+msgstr ""
+
+#. TRANSLATORS:
+#. data/base/messages/resmessagesall.json: $.RES_SENSO1.text[0]
+#. data/mp/messages/resmessagesall.json: $.RES_SENSO1.text[0]
+#: po/custom/fromJson.txt:4272
+msgid "New Systems Turret Available For Design"
 msgstr ""
 
 #. TRANSLATORS:
