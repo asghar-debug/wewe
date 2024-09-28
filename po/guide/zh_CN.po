@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: warzone2100\n"
 "Report-Msgid-Bugs-To: warzone2100-project@lists.sourceforge.net\n"
 "POT-Creation-Date: 2024-06-12 03:55+0000\n"
-"PO-Revision-Date: 2024-09-11 19:59\n"
+"PO-Revision-Date: 2024-09-28 02:26\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -66,7 +66,7 @@ msgid "The Project dispatches three teams with the objective of reclaiming artif
 msgstr "“项目”派遣了三个中队，以回收遗留科技为目标，以便研究和使用“大崩溃”前的技术。"
 
 msgid "- Team Alpha is sent to an Arizona desert location southeast of Project HQ"
-msgstr "- Alpha 中队被派往位于“项目”总部东南方的亚利桑那沙漠"
+msgstr "- Alpha 中队被派往位于“工程”总部东南方的亚利桑那沙漠"
 
 msgid "- Beta team is sent to the remains of Chicago"
 msgstr "- Beta 中队被派往芝加哥的废墟上"
@@ -429,7 +429,7 @@ msgid "- Return for Repair: Unit will return to a Repair Facility"
 msgstr "- 返回维修：单位将返回到维修设施"
 
 msgid "- Return to HQ: Unit will return to Command Center or LZ (campaign)"
-msgstr "- 返回总部：单位将返回到指挥中心或着陆点 (战役模式)"
+msgstr "- 返回指挥中心：单位将返回到指挥中心或着陆点 (战役模式)"
 
 msgid "- Go To Transport: Unit will go to and board transport"
 msgstr "- 前往运输舰：单位将前往并登陆运输舰"
